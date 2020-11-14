@@ -6,7 +6,7 @@ import random
 import youtube_dl
 from discord.ext import commands
 
-TOKEN = "NzExNjc2MzE5NjcwNDY4NzQw.XsGeOA.XTTzKKWK3dHoWuFLII8GsJRNcoQ"
+TOKEN = "NzExNjc2MzE5NjcwNDY4NzQw.XsGeOA.HTvkWb2n4QEZtr9XFKJ85227vpM"
 client = commands.Bot(command_prefix="*")
 players = {}
 smashers = []
