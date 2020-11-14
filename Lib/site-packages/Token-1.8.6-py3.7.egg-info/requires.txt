@@ -1,0 +1,5 @@
+urllib3>=1.10
+six>=1.9
+certifi
+python-dateutil
+ed25519
