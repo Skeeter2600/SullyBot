@@ -496,10 +496,6 @@ async def leave(ctx):
 #        ctx.voice_channel.play(player, after=lambda e: print('Player error: %s' % e) if e else None)
 #    await ctx.send('Now playing: {}'.format(player.title))
 
-
-basepath = 'C:/Users/Beck/Desktop/Projects/Sullybot (Python)/cogs'
-for file in os.listdir(basepath):
-    if file.endswith('.py'):
-        client.load_extension(f'cogs.{file[:-3]}')
+client.load_extension("cogs.rpg_quest")
 
 client.run(TOKEN)
