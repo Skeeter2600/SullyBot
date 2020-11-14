@@ -1,12 +1,13 @@
 import asyncio
+
 import discord
 import os
 import random
 import youtube_dl
 from discord.ext import commands
 
+TOKEN = "NzExNjc2MzE5NjcwNDY4NzQw.XsGeOA.XTTzKKWK3dHoWuFLII8GsJRNcoQ"
 client = commands.Bot(command_prefix="*")
-TOKEN = "NzExNjc2MzE5NjcwNDY4NzQw.XvIzZA.73pYMXF8EWBdDUR0Dz6D0Ba6YKU"
 players = {}
 smashers = []
 smash_queue = []
@@ -15,7 +16,7 @@ smash_queue_pointer = 0
 ydl = youtube_dl.YoutubeDL({'outtmpl': '%(id)s%(ext)s'})
 
 youtube_dl.utils.bug_reports_message = lambda: ''
-
+# 🥺🥺🥺🥺🥺🥺
 ytdl_format_options = {
     'format': 'bestaudio/best',
     'outtmpl': '%(extractor)s-%(id)s-%(title)s.%(ext)s',
@@ -376,7 +377,7 @@ async def next_fight(ctx):
         if flare == 0:
             if read[0] == "singles":
                 await ctx.send("Next up: " + read[1] + " VS " + read[2] + fight_flares[0] +
-                               read[player+1] + " fights dirty!")
+                               read[player + 1] + " fights dirty!")
             else:
                 if player == 1:
                     await ctx.send("Next up: " + read[1] + " and " + read[2] + " VS " + read[3] +
@@ -386,7 +387,7 @@ async def next_fight(ctx):
                                    " and " + read[4] + fight_flares[0] + read[3] + " and " + read[4] + " fight dirty!")
         elif flare == 1:
             if read[0] == "singles":
-                await ctx.send("Next up: " + read[1] + " VS " + read[2] + " ! " + read[player+1] + fight_flares[1])
+                await ctx.send("Next up: " + read[1] + " VS " + read[2] + " ! " + read[player + 1] + fight_flares[1])
             else:
                 if player == 1:
                     await ctx.send("Next up: " + read[1] + " and " + read[2] + " VS " + read[3] +
@@ -397,7 +398,7 @@ async def next_fight(ctx):
         elif flare == 2:
             if read[0] == "singles":
                 await ctx.send("Next up: " + read[1] + " VS " + read[2] + fight_flares[2] +
-                               read[player+1] + " wins.")
+                               read[player + 1] + " wins.")
             else:
                 if player == 1:
                     await ctx.send("Next up: " + read[1] + " and " + read[2] + " VS " + read[3] +
@@ -408,7 +409,7 @@ async def next_fight(ctx):
         elif flare == 6:
             if read[0] == "singles":
                 await ctx.send("Next up: " + read[1] + " VS " + read[2] + fight_flares[6] +
-                               read[player+1] + " next time.")
+                               read[player + 1] + " next time.")
             else:
                 if player == 1:
                     await ctx.send("Next up: " + read[1] + " and " + read[2] + " VS " + read[3] +
@@ -419,7 +420,7 @@ async def next_fight(ctx):
         elif flare == 7:
             if read[0] == "singles":
                 await ctx.send("Next up: " + read[1] + " VS " + read[2] + fight_flares[7] +
-                               read[player+1] + " will win this one.")
+                               read[player + 1] + " will win this one.")
             else:
                 if player == 1:
                     await ctx.send("Next up: " + read[1] + " and " + read[2] + " VS " + read[3] +
@@ -436,6 +437,29 @@ async def next_fight(ctx):
                 await ctx.send("Next up: " + read[1] + " and " + read[2] + " VS " + read[3] +
                                " and " + read[4] + fight_flares[flare])
         smash_queue_pointer += 1
+
+
+@client.command()
+async def image(ctx, message):
+    if message == "🥺":
+        await ctx.send("🥺🥺🥺🥺🥺🥺")
+    if message == "jerkoff":
+        await ctx.send(":middle_finger:         :weary:\n   :bug::zzz::necktie::bug:\n               ⛽️       :boot:\n "
+                       "              ⚡️8=:punch:=D:sweat_drops:\n          :guitar: "
+                       ":closed_umbrella:\n          ⛽️      ⛽️\n          :boot:      :boot:")
+    if message == "daffy":
+        await ctx.send("--------┈┈╱╱╱▔ --------┈╱╭┈▔▔╲ \n--------▕▏┊╱╲┈╱▏  \n--------▕▏▕╮▕▕╮▏ --------▕▏▕▋▕▕▋  "
+                       "\n--------╱▔▔╲╱▔▔╲╮┈┈╱▔▔╲  \n--------▏▔▏┈┈▔┈┈▔▔▔╱▔▔╱ \n ---------╲┈╲┈┈┈┈┈┈┈╱▔▔▔  "
+                       "\n----------┈▔╲╲▂▂▂▂▂╱  \n----------┈┈▕━━▏ \n ⠄⠄⠄⠄⠄⠄⣠⢼⣿⣷⣶⣾⡷⢸⣗⣯⣿⣶⣿⣶⡄ \n⠄⠄⠄ "
+                       "⠄⠄⣀⣤⣴⣾⣿⣷⣭⣭⣭⣾⣿⣿⣿⣿⣿⣿⣿⣿⣿⡀ \n⠄⠄ ⠄⣾⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣸⣿⣿⣧ \n⠄⠄ ⠄⣿⣿⢿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣯⢻⣿⣿⡄ \n⠄ "
+                       "⠄⢸⣿⣮⣿⣿⣿⣿⣿⣿⣿⡟⢹⣿⣿⣿⡟⢛⢻⣷⢻⣿⣧ \n⠄ ⠄⠄⣿⡏⣿⡟⡛⢻⣿⣿⣿⣿⠸⣿⣿⣿⣷⣬⣼⣿⢸⣿⣿ \n⠄ ⠄⠄⣿⣧⢿⣧⣥⣾⣿⣿⣿⡟⣴⣝⠿⣿⣿⣿⠿⣫⣾⣿⣿⡆ \n "
+                       "⠄⠄⢸⣿⣮⡻⠿⣿⠿⣟⣫⣾⣿⣿⣿⣷⣶⣾⣿⡏⣿⣿⣿⡇ \n ⠄⠄⢸⣿⣿⣿⡇⢻⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣇⣿⣿⣿⡇ \n ⠄⠄⢸⣿⣿⣿⡇⠄⢿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⢸⣿⣿⣿⠄ \n "
+                       "⠄⠄⣼⣿⣿⣿⢃⣾⣾⣿⣿⣿⣿⣿⣿⣿⣿⣿⡏⣿⣿⣿ \n⠄ ⠄⠄⣿⣿⡟⣵⣿")
+
+    if message == "<:Quagsire:651960845944750083>":
+        with open('etc/images/quagsire1.jpg', 'rb') as f:
+            picture = discord.File(f)
+            await ctx.send(picture)
 
 
 @client.command()
