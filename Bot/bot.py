@@ -5,6 +5,8 @@ import os
 import random
 # import youtube_dl
 from discord.ext import commands
+from itertools import chain, combinations
+# from cogs import TOKEN_ID
 
 TOKEN = "NzExNjc2MzE5NjcwNDY4NzQw.XsGeOA.HTvkWb2n4QEZtr9XFKJ85227vpM"
 client = commands.Bot(command_prefix="*")
@@ -126,7 +128,7 @@ async def smash(ctx, condition, person):
             await ctx.send(person + " isn't in the queue stupid!")
         else:
             smashers.remove(person)
-            await ctx.send(person + ' was dropped to the roster. Please make a new fight queue to see the update.')
+            await ctx.send(person + ' was dropped from the roster. Please make a new fight queue to see the update.')
 
 
 @client.command()
@@ -141,219 +143,55 @@ async def fight(ctx, fight_type):
     else:
         smashers_total = len(smashers)
 
+        if smashers_total < 3:
+            await ctx.send("Do you really need my help with this? Either fight by yourselves or rotate.")
+
         # 1 on 1 fights
         if fight_type == "singles":
-            # mix up the queue
-            random.shuffle(smashers)
 
-            if smashers_total < 3:
-                await ctx.send("Do you really need my help with this? Either fight by yourselves or rotate.")
-            # 4 people want to fight
-            elif smashers_total == 4:
-                smash_queue.append(["singles", smashers[0], smashers[1]])
-                smash_queue.append(["singles", smashers[2], smashers[3]])
+            # generate all combinations of pairings of fighters
+            for i in list(combinations(smashers, 2)):
+                i.insert(0, "singles")
+                smash_queue.append(i)
 
-                smash_queue.append(["singles", smashers[0], smashers[3]])
-                smash_queue.append(["singles", smashers[1], smashers[2]])
-
-                smash_queue.append(["singles", smashers[1], smashers[3]])
-                smash_queue.append(["singles", smashers[0], smashers[2]])
-                create = True
-            # 5 people want to fight
-            elif smashers_total == 5:
-                smash_queue.append(["singles", smashers[0], smashers[1]])
-                smash_queue.append(["singles", smashers[2], smashers[3]])
-
-                smash_queue.append(["singles", smashers[4], smashers[0]])
-                smash_queue.append(["singles", smashers[1], smashers[2]])
-
-                smash_queue.append(["singles", smashers[3], smashers[4]])
-                smash_queue.append(["singles", smashers[0], smashers[2]])
-
-                smash_queue.append(["singles", smashers[4], smashers[2]])
-                smash_queue.append(["singles", smashers[3], smashers[1]])
-
-                smash_queue.append(["singles", smashers[3], smashers[0]])
-                smash_queue.append(["singles", smashers[1], smashers[4]])
-                create = True
-            # 6 people want to fight
-            elif smashers_total == 6:
-                smash_queue.append(["singles", smashers[0], smashers[1]])
-                smash_queue.append(["singles", smashers[2], smashers[5]])
-                smash_queue.append(["singles", smashers[4], smashers[3]])
-
-                smash_queue.append(["singles", smashers[2], smashers[3]])
-                smash_queue.append(["singles", smashers[5], smashers[0]])
-                smash_queue.append(["singles", smashers[1], smashers[4]])
-
-                smash_queue.append(["singles", smashers[5], smashers[3]])
-                smash_queue.append(["singles", smashers[1], smashers[2]])
-                smash_queue.append(["singles", smashers[0], smashers[4]])
-
-                smash_queue.append(["singles", smashers[3], smashers[0]])
-                smash_queue.append(["singles", smashers[2], smashers[4]])
-                smash_queue.append(["singles", smashers[1], smashers[5]])
-
-                smash_queue.append(["singles", smashers[4], smashers[5]])
-                smash_queue.append(["singles", smashers[0], smashers[2]])
-                smash_queue.append(["singles", smashers[3], smashers[1]])
-                create = True
-            # 7 people want to fight
-            elif smashers_total == 7:
-                smash_queue.append(["singles", smashers[0], smashers[5]])
-                smash_queue.append(["singles", smashers[1], smashers[4]])
-                smash_queue.append(["singles", smashers[2], smashers[3]])
-                smash_queue.append(["singles", smashers[3], smashers[1]])
-
-                smash_queue.append(["singles", smashers[4], smashers[0]])
-                smash_queue.append(["singles", smashers[5], smashers[6]])
-                smash_queue.append(["singles", smashers[1], smashers[6]])
-                smash_queue.append(["singles", smashers[2], smashers[5]])
-
-                smash_queue.append(["singles", smashers[3], smashers[4]])
-                smash_queue.append(["singles", smashers[4], smashers[2]])
-                smash_queue.append(["singles", smashers[5], smashers[1]])
-                smash_queue.append(["singles", smashers[6], smashers[0]])
-
-                smash_queue.append(["singles", smashers[2], smashers[1]])
-                smash_queue.append(["singles", smashers[3], smashers[6]])
-                smash_queue.append(["singles", smashers[4], smashers[5]])
-                smash_queue.append(["singles", smashers[5], smashers[3]])
-
-                smash_queue.append(["singles", smashers[6], smashers[2]])
-                smash_queue.append(["singles", smashers[0], smashers[1]])
-                smash_queue.append(["singles", smashers[6], smashers[3]])
-                smash_queue.append(["singles", smashers[0], smashers[3]])
-                smash_queue.append(["singles", smashers[1], smashers[2]])
-                create = True
-            # 8 people want to fight
-            elif smashers_total == 8:
-                # good
-                smash_queue.append(["singles", smashers[0], smashers[7]])
-                smash_queue.append(["singles", smashers[1], smashers[6]])
-                smash_queue.append(["singles", smashers[2], smashers[5]])
-                smash_queue.append(["singles", smashers[3], smashers[4]])
-                # good
-                smash_queue.append(["singles", smashers[0], smashers[6]])
-                smash_queue.append(["singles", smashers[5], smashers[7]])
-                smash_queue.append(["singles", smashers[1], smashers[4]])
-                smash_queue.append(["singles", smashers[2], smashers[3]])
-                # good
-                smash_queue.append(["singles", smashers[0], smashers[5]])
-                smash_queue.append(["singles", smashers[4], smashers[6]])
-                smash_queue.append(["singles", smashers[3], smashers[7]])
-                smash_queue.append(["singles", smashers[1], smashers[2]])
-                # good
-                smash_queue.append(["singles", smashers[0], smashers[4]])
-                smash_queue.append(["singles", smashers[3], smashers[5]])
-                smash_queue.append(["singles", smashers[2], smashers[6]])
-                smash_queue.append(["singles", smashers[1], smashers[7]])
-                # good
-                smash_queue.append(["singles", smashers[0], smashers[3]])
-                smash_queue.append(["singles", smashers[2], smashers[4]])
-                smash_queue.append(["singles", smashers[1], smashers[5]])
-                smash_queue.append(["singles", smashers[6], smashers[7]])
-                # good
-                smash_queue.append(["singles", smashers[0], smashers[2]])
-                smash_queue.append(["singles", smashers[1], smashers[3]])
-                smash_queue.append(["singles", smashers[4], smashers[7]])
-                smash_queue.append(["singles", smashers[5], smashers[6]])
-                # good
-                smash_queue.append(["singles", smashers[0], smashers[1]])
-                smash_queue.append(["singles", smashers[2], smashers[7]])
-                smash_queue.append(["singles", smashers[3], smashers[6]])
-                smash_queue.append(["singles", smashers[4], smashers[5]])
-                create = True
+            create = True
 
         # 2 on 2 fights
         elif fight_type == "doubles":
-            if len(smashers) < 4:
+            if smashers_total < 4:
                 await ctx.send("You can't do doubles with less than 4 people!")
             else:
-                # mix up the queue
-                random.shuffle(smashers)
-                # 4 people want to fight
-                if smashers_total == 4:
-                    smash_queue.append(["doubles", smashers[0], smashers[1], smashers[2], smashers[3]])
-                    smash_queue.append(["doubles", smashers[0], smashers[3], smashers[1], smashers[2]])
-                    smash_queue.append(["doubles", smashers[1], smashers[3], smashers[0], smashers[2]])
-                    create = True
-                # 5 people want to fight
-                elif smashers_total == 5:
-                    smash_queue.append(["doubles", smashers[0], smashers[1], smashers[2], smashers[3]])
-                    smash_queue.append(["doubles", smashers[4], smashers[0], smashers[1], smashers[2]])
-                    smash_queue.append(["doubles", smashers[3], smashers[4], smashers[0], smashers[2]])
-                    smash_queue.append(["doubles", smashers[4], smashers[2], smashers[3], smashers[1]])
-                    smash_queue.append(["doubles", smashers[3], smashers[0], smashers[1], smashers[4]])
-                    create = True
-                # 6 people want to fight
-                elif smashers_total == 6:
-                    smash_queue.append(["doubles", smashers[0], smashers[1], smashers[2], smashers[5]])
-                    smash_queue.append(["doubles", smashers[4], smashers[3], smashers[2], smashers[3]])
-                    smash_queue.append(["doubles", smashers[5], smashers[0], smashers[1], smashers[4]])
-                    smash_queue.append(["doubles", smashers[5], smashers[3], smashers[1], smashers[2]])
-                    smash_queue.append(["doubles", smashers[0], smashers[4], smashers[3], smashers[0]])
-                    smash_queue.append(["doubles", smashers[2], smashers[4], smashers[1], smashers[5]])
-                    smash_queue.append(["doubles", smashers[4], smashers[5], smashers[0], smashers[2]])
-                    smash_queue.append(["doubles", smashers[3], smashers[1], smashers[0], smashers[1]])
-                    smash_queue.append(["doubles", smashers[2], smashers[5], smashers[4], smashers[3]])
-                    smash_queue.append(["doubles", smashers[2], smashers[3], smashers[5], smashers[0]])
-                    smash_queue.append(["doubles", smashers[1], smashers[4], smashers[5], smashers[3]])
-                    smash_queue.append(["doubles", smashers[1], smashers[2], smashers[0], smashers[4]])
-                    smash_queue.append(["doubles", smashers[3], smashers[0], smashers[2], smashers[4]])
-                    smash_queue.append(["doubles", smashers[1], smashers[5], smashers[4], smashers[5]])
-                    smash_queue.append(["doubles", smashers[0], smashers[2], smashers[3], smashers[1]])
-                    create = True
 
-                # 7 people want to fight
-                elif smashers_total == 7:
-                    smash_queue.append(["doubles", smashers[0], smashers[5], smashers[1], smashers[4]])
-                    smash_queue.append(["doubles", smashers[2], smashers[3], smashers[3], smashers[1]])
-                    smash_queue.append(["doubles", smashers[4], smashers[0], smashers[5], smashers[6]])
-                    smash_queue.append(["doubles", smashers[1], smashers[6], smashers[2], smashers[5]])
-                    smash_queue.append(["doubles", smashers[3], smashers[4], smashers[4], smashers[2]])
-                    smash_queue.append(["doubles", smashers[5], smashers[1], smashers[6], smashers[0]])
-                    smash_queue.append(["doubles", smashers[2], smashers[1], smashers[3], smashers[6]])
-                    smash_queue.append(["doubles", smashers[4], smashers[5], smashers[5], smashers[3]])
-                    smash_queue.append(["doubles", smashers[6], smashers[2], smashers[0], smashers[1]])
-                    smash_queue.append(["doubles", smashers[6], smashers[3], smashers[0], smashers[3]])
-                    smash_queue.append(["doubles", smashers[1], smashers[2], smashers[0], smashers[5]])
-                    smash_queue.append(["doubles", smashers[1], smashers[4], smashers[2], smashers[3]])
-                    smash_queue.append(["doubles", smashers[3], smashers[1], smashers[4], smashers[0]])
-                    smash_queue.append(["doubles", smashers[5], smashers[6], smashers[1], smashers[6]])
-                    smash_queue.append(["doubles", smashers[2], smashers[5], smashers[3], smashers[4]])
-                    smash_queue.append(["doubles", smashers[4], smashers[2], smashers[5], smashers[1]])
-                    smash_queue.append(["doubles", smashers[6], smashers[0], smashers[2], smashers[1]])
-                    smash_queue.append(["doubles", smashers[3], smashers[6], smashers[4], smashers[5]])
-                    smash_queue.append(["doubles", smashers[5], smashers[3], smashers[6], smashers[2]])
-                    smash_queue.append(["doubles", smashers[0], smashers[1], smashers[6], smashers[3]])
-                    smash_queue.append(["doubles", smashers[0], smashers[3], smashers[1], smashers[2]])
-                    create = True
+                # generate all combinations of pairs of fighters
+                # in all sets of 4 fighters
+                for i in list(combinations(smashers, 4)):
+                    # inside each possible quadruple
 
-                # 8 people want to fight
-                elif smashers_total == 8:
-                    smash_queue.append(["doubles", smashers[0], smashers[7], smashers[1], smashers[6]])
-                    smash_queue.append(["doubles", smashers[2], smashers[5], smashers[3], smashers[4]])
-                    smash_queue.append(["doubles", smashers[0], smashers[6], smashers[5], smashers[7]])
-                    smash_queue.append(["doubles", smashers[1], smashers[4], smashers[2], smashers[3]])
-                    smash_queue.append(["doubles", smashers[0], smashers[5], smashers[4], smashers[6]])
-                    smash_queue.append(["doubles", smashers[3], smashers[7], smashers[1], smashers[2]])
-                    smash_queue.append(["doubles", smashers[0], smashers[4], smashers[3], smashers[5]])
-                    smash_queue.append(["singles", smashers[2], smashers[6], smashers[1], smashers[7]])
-                    smash_queue.append(["singles", smashers[0], smashers[3], smashers[2], smashers[4]])
-                    smash_queue.append(["singles", smashers[1], smashers[5], smashers[6], smashers[7]])
-                    smash_queue.append(["singles", smashers[0], smashers[2], smashers[1], smashers[3]])
-                    smash_queue.append(["singles", smashers[4], smashers[7], smashers[5], smashers[6]])
-                    smash_queue.append(["singles", smashers[0], smashers[1], smashers[2], smashers[7]])
-                    smash_queue.append(["singles", smashers[3], smashers[6], smashers[4], smashers[5]])
-                    create = True
+                    l = []
+
+                    for j in list(combinations(i, 2)):
+                        # inside each pair in quadruple
+
+                        for k in j:
+                            # each fighter instance in pair
+                            # flatten list and append
+                            l.append(k)
+                    
+                    for m in range(0, int(len(l) / 4)):
+                        # collect pairs from quadruple and append to queue
+                        smash_queue.append(["doubles", 
+                            l[2 * m], l[2 * m + 1], l[11 - (2 * m)], l[10 - (2 * m)]])
+
+                create = True
+
         if create:
+            random.shuffle(smash_queue)
             await ctx.send("The queue is ready!")
             await next_fight(ctx)
             global smash_queue_pointer
             smash_queue_pointer += 1
         else:
-            await ctx.send("Either remove or add people so its between 4 and 8 people for singles or doubles.")
+            await ctx.send("Add people so there are at least 4 people in the roster.")
 
 
 @client.command()
@@ -369,9 +207,7 @@ async def next_fight(ctx):
     global smash_queue_pointer
     flare = random.randint(0, 7)
     player = random.randint(0, 1)
-    read = smash_queue[smash_queue_pointer]
-    if smash_queue_pointer == len(smash_queue):
-        smash_queue_pointer = 0
+    read = smash_queue[smash_queue_pointer % len(smash_queue)]
     if not smash_queue:
         await ctx.send("Make sure the smash queue exists. Can't fight without one!")
     else:
@@ -444,11 +280,11 @@ async def next_fight(ctx):
 async def image(ctx, message):
     if message == "🥺":
         await ctx.send("🥺🥺🥺🥺🥺🥺")
-    if message == "jerkoff":
+    elif message == "jerkoff":
         await ctx.send(":middle_finger:         :weary:\n   :bug::zzz::necktie::bug:\n               ⛽️       :boot:\n "
                        "              ⚡️8=:punch:=D:sweat_drops:\n          :guitar: "
                        ":closed_umbrella:\n          ⛽️      ⛽️\n          :boot:      :boot:")
-    if message == "daffy":
+    elif message == "daffy":
         await ctx.send("--------┈┈╱╱╱▔ --------┈╱╭┈▔▔╲ \n--------▕▏┊╱╲┈╱▏  \n--------▕▏▕╮▕▕╮▏ --------▕▏▕▋▕▕▋  "
                        "\n--------╱▔▔╲╱▔▔╲╮┈┈╱▔▔╲  \n--------▏▔▏┈┈▔┈┈▔▔▔╱▔▔╱ \n ---------╲┈╲┈┈┈┈┈┈┈╱▔▔▔  "
                        "\n----------┈▔╲╲▂▂▂▂▂╱  \n----------┈┈▕━━▏ \n ⠄⠄⠄⠄⠄⠄⣠⢼⣿⣷⣶⣾⡷⢸⣗⣯⣿⣶⣿⣶⡄ \n⠄⠄⠄ "
@@ -457,7 +293,7 @@ async def image(ctx, message):
                        "⠄⠄⢸⣿⣮⡻⠿⣿⠿⣟⣫⣾⣿⣿⣿⣷⣶⣾⣿⡏⣿⣿⣿⡇ \n ⠄⠄⢸⣿⣿⣿⡇⢻⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣇⣿⣿⣿⡇ \n ⠄⠄⢸⣿⣿⣿⡇⠄⢿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⢸⣿⣿⣿⠄ \n "
                        "⠄⠄⣼⣿⣿⣿⢃⣾⣾⣿⣿⣿⣿⣿⣿⣿⣿⣿⡏⣿⣿⣿ \n⠄ ⠄⠄⣿⣿⡟⣵⣿")
 
-    if message == "<:Quagsire:651960845944750083>":
+    elif message == "<:Quagsire:651960845944750083>":
         with open('etc/images/quagsire1.jpg', 'rb') as f:
             picture = discord.File(f)
             await ctx.send(picture)
