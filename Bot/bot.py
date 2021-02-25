@@ -139,7 +139,7 @@ async def fight(ctx, fight_type):
     if len(smashers) == 0:
         await ctx.send("Gotta add people to the roster in order to fight, retard (if we used the word)!")
     elif len(smashers) == 1:
-        await ctx.send("It's not good to play with yourself. Add others to the roster.")
+        await ctx.send("It's not good to play with yourself. Add others to the roster.") //check
     else:
         smashers_total = len(smashers)
 
