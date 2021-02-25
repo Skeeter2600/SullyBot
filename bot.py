@@ -6,9 +6,10 @@ import random
 # import youtube_dl
 from discord.ext import commands
 from itertools import chain, combinations
-# from cogs import TOKEN_ID
+import json
 
-TOKEN = "NzExNjc2MzE5NjcwNDY4NzQw.XsGeOA.HTvkWb2n4QEZtr9XFKJ85227vpM"
+TOKEN = json.loads(open("cogs/TOKEN_ID.json", "r").read()).get("TOKEN")
+
 client = commands.Bot(command_prefix="*")
 players = {}
 smashers = []
@@ -93,22 +94,13 @@ async def pong(ctx):
 
 @client.command()
 async def advise(ctx, *, question):
-    outcomes = ["I don't know man, I'm just a machine in a basement",
-                "Abso-fucking-lutely",
-                "Nah",
-                "Uhhhhh, sure",
-                "Who cares?",
-                "Not this time champ",
-                "If you watch yourself, then maybe",
-                "Slip me a 20, then we'll see"]
-    await ctx.send(f'Question: {question}\nAnswer: {random.choice(outcomes)}')
+    answers = json.loads(open("responses/responses.json", "r").read()).get("answers")
+    await ctx.send(f'Question: {question}\nAnswer: {random.choice(answers)}')
 
 
 @client.command(aliases=['hi'])
 async def hello(ctx):
-    hellos = ["Sup",
-              "It's great to be here!",
-              "What do you want me to say, ''Its great to be here!'' or something?"]
+    hellos = json.loads(open("responses/hellos.json", "r").read()).get("hellos")
     await ctx.send(random.choice(hellos))
 
 
@@ -320,6 +312,12 @@ async def leave(ctx):
     server = ctx.message.guild.voice_client
     await server.disconnect()
 
+@client.command(aliases=["quit"])
+@commands.has_permissions(administrator=True)
+async def close(ctx):
+    await ctx.send("😏")
+    await client.close()
+    print("Good riddance")
 
 # @client.command()
 # async def play(ctx, url):
