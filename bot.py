@@ -94,7 +94,7 @@ async def pong(ctx):
 
 @client.command()
 async def advise(ctx, *, question):
-    answers = json.loads(open("responses/responses.json", "r").read()).get("answers")
+    answers = json.loads(open("responses/questions.json", "r").read()).get("answers")
     await ctx.send(f'Question: {question}\nAnswer: {random.choice(answers)}')
 
 
@@ -131,7 +131,7 @@ async def fight(ctx, fight_type):
     if len(smashers) == 0:
         await ctx.send("Gotta add people to the roster in order to fight, retard (if we used the word)!")
     elif len(smashers) == 1:
-        await ctx.send("It's not good to play with yourself. Add others to the roster.") //check
+        await ctx.send("It's not good to play with yourself. Add others to the roster.")
     else:
         smashers_total = len(smashers)
 
@@ -312,7 +312,7 @@ async def leave(ctx):
     server = ctx.message.guild.voice_client
     await server.disconnect()
 
-@client.command(aliases=["quit"])
+@client.command(aliases=["quit", "q"])
 @commands.has_permissions(administrator=True)
 async def close(ctx):
     await ctx.send("😏")
