@@ -109,8 +109,15 @@ async def smash(ctx, condition, person):
     global smashers
     global smash_queue
     if condition == "add":
-        smashers.append(person)
-        await ctx.send(person + ' was added to the roster!')
+        length = len(person)
+        userId = person[3: length-1]
+        player = ctx.message.guild.get_member(userId)
+        if player is not None:
+            smashers.append(player)
+            name = player.name
+            await ctx.send(name + ' was added to the roster!')
+        else:
+            await ctx.send("User doesn't exist. Add one that does...")
     elif condition == "clear":
         smashers = []
         smash_queue = []
