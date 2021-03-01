@@ -105,29 +105,35 @@ async def hello(ctx):
 
 
 @client.command()
-async def smash(ctx, condition, person):
+async def smash(ctx, condition, person = None):
     global smashers
     global smash_queue
-    if condition == "add":
-        length = len(person)
-        userId = person[3: length-1]
-        player = ctx.message.guild.get_member(userId)
-        if player is not None:
-            smashers.append(player)
-            name = player.name
-            await ctx.send(name + ' was added to the roster!')
-        else:
-            await ctx.send("User doesn't exist. Add one that does...")
-    elif condition == "clear":
+    personCmd = ["add", "drop", "remove"]
+    if condition == "clear":
         smashers = []
         smash_queue = []
         await ctx.send("The roster was cleared")
-    elif condition == "drop" or condition == "remove":
-        if person not in smashers:
-            await ctx.send(person + " isn't in the queue stupid!")
+    elif condition == "roster":
+        msg = ""
+        for i in range(len(smashers)):
+            msg += f'@{smashers[i].name}'
+            if i + 1 != len(smashers):
+                msg += ", "
+        await ctx.send("Current smash roster: " + msg)
+    elif condition in personCmd:
+        player = client.get_user(int (person[3 : len(person) - 1]))
+        if player != None:
+            if condition == "add":
+                smashers.append(player)
+                await ctx.send(f'@{player.name} was added to the roster!')
+            else:
+                if player in smashers:
+                    smashers.remove(player)
+                    await ctx.send(f'@{player.name} was dropped from the roster. Please make a new fight queue to see the update.')
+                else:
+                    await ctx.send(f'@{player.name} isn\'t in the queue stupid!')
         else:
-            smashers.remove(person)
-            await ctx.send(person + ' was dropped from the roster. Please make a new fight queue to see the update.')
+            await ctx.send(f"User \"{person}\"doesn't exist. Mention one that does...")
 
 
 @client.command()
