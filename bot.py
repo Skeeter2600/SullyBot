@@ -156,8 +156,9 @@ async def fight(ctx, fight_type):
 
             # generate all combinations of pairings of fighters
             for i in list(combinations(smashers, 2)):
-                i.insert(0, "singles")
-                smash_queue.append(i)
+                j = ["singles"]
+                j.append(i)
+                smash_queue.append(j)
 
             create = True
 
@@ -325,12 +326,23 @@ async def leave(ctx):
     server = ctx.message.guild.voice_client
     await server.disconnect()
 
-@client.command(aliases=["quit", "q"])
-@commands.has_permissions(administrator=True)
+@client.command()
+async def dev(ctx, condition, person):
+    if condition == "add":
+        devs = json.loads(open("cogs/devs.json", "r").read())
+        devs["devs"].append(int(person[3 : -1]))
+        open("cogs/devs.json", "w").write(json.dumps(devs))
+
+@client.command(aliases=["quit", "q", "kil", "kill", "die"])
 async def close(ctx):
-    await ctx.send("😏")
-    await client.close()
-    print("Good riddance")
+    devs = json.loads(open("cogs/devs.json", "r").read()).get("devs")
+    if ctx.author.id in devs:
+        await ctx.send("😏")
+        await client.close()
+        print("Good riddance")
+    else:
+        await ctx.send("**you lack the power to shut me down**")
+
 
 # @client.command()
 # async def play(ctx, url):
