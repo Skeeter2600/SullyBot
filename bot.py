@@ -8,9 +8,9 @@ from discord.ext import commands
 from itertools import chain, combinations
 import json
 
-TOKEN = json.loads(open("cogs/TOKEN_ID.json", "r").read()).get("TOKEN")
+TOKEN = json.loads(open("cogs/TOKEN_ID.json", "r").read()).get("HONEY")
 
-client = commands.Bot(command_prefix="*")
+client = commands.Bot(command_prefix="`")
 players = {}
 smashers = []
 smash_queue = []
@@ -328,10 +328,27 @@ async def leave(ctx):
 
 @client.command()
 async def dev(ctx, condition, person):
-    if condition == "add":
+    try:
+        user = client.get_user(int (person[3 : len(person) - 1]))
+    except ValueError:
+        await ctx.send(f'User "{person}" doesn\'t exist. Mention one that does...')
+
+    if user != None:
         devs = json.loads(open("cogs/devs.json", "r").read())
-        devs["devs"].append(int(person[3 : -1]))
+        if condition == "add":
+            devs["devs"].append(user.id)
+            await ctx.send(f'@{user.name} has been hired.')
+        elif condition == "remove":
+            if user.id in devs["devs"]:
+                devs["devs"].remove(user.id)
+                await ctx.send(f'@{user.name} has been fired.')
+            else:
+                await ctx.send(f'@{user.name} isn\'t on the payroll')
+        else:
+            await ctx.send("Please either add or remove a dev")
         open("cogs/devs.json", "w").write(json.dumps(devs))
+    else:
+        await ctx.send(f"User \"{person}\"doesn't exist. Mention one that does...")
 
 @client.command(aliases=["quit", "q", "kil", "kill", "die"])
 async def close(ctx):
