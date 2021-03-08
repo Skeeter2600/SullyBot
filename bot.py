@@ -1,11 +1,7 @@
-import asyncio
-
 import discord
-import os
 import random
 # import youtube_dl
 from discord.ext import commands
-from itertools import chain, combinations
 import json
 
 TOKEN = json.loads(open("cogs/TOKEN_ID.json", "r").read()).get("TOKEN")
@@ -249,66 +245,93 @@ async def next_fight(ctx):
     if not smash_queue:
         await ctx.send("Make sure the smash queue exists. Can't fight without one!")
     else:
+        # flare used for testing (remove in future)
         if flare == 8:
+            # add players that played to list
             for fighters in smash_queue:
                 if fighters[2]:
                     past_fighters.append(fighters)
+            # if everyone in list, reset everything
             if len(past_fighters) == len(smash_queue):
                 for fighters in smash_queue:
                     fighters[2] = False
                 past_fighters = []
+            # if singles system
             if current_fighter[0] == "singles":
                 condition = True
                 checking = 0
                 opponent_queue_pointer = smash_queue_pointer
                 while condition:
+                    # get the current fighter
                     current_fighter = smash_queue[smash_queue_pointer % len(smash_queue)]
+
                     if current_fighter not in past_fighters:
+                        # if player hasn't fought everyone
                         if len(current_fighter[3]) != len(smash_queue)-1:
+                            # add the mix up value to pointer and get the next competitor
                             opponent_queue_pointer = opponent_queue_pointer + mix_up
                             attempted_fight = smash_queue[opponent_queue_pointer % len(smash_queue)]
+
+                            # if the competitor has already fought
                             while attempted_fight in past_fighters:
                                 opponent_queue_pointer = opponent_queue_pointer + 1
                                 attempted_fight = smash_queue[opponent_queue_pointer % len(smash_queue)]
                                 if attempted_fight[1] == current_fighter[1]:
                                     opponent_queue_pointer = opponent_queue_pointer + 1
                                     attempted_fight = smash_queue[opponent_queue_pointer % len(smash_queue)]
+
+                            # if the competitor isn't the same as the player
                             if attempted_fight[1] != current_fighter[1]:
+                                # list of opponents that player has played against
                                 opponents = current_fighter[3]
                                 if attempted_fight[1] not in opponents:
+                                    # add fighters to each others opponents and update fought to true
                                     current_fighter[3].append(attempted_fight[1])
                                     attempted_fight[3].append(current_fighter[1])
                                     current_fighter[2] = True
                                     attempted_fight[2] = True
+                                    # send
                                     await ctx.send("This step of the test matched up " + current_fighter[1].mention + " versus " +
                                                    attempted_fight[1].mention)
+                                    # break while
                                     condition = False
                                     checking = 0
+                                # if the opponent has already been played against
                                 elif attempted_fight[1] in current_fighter[3]:
+                                    # get next competitor
                                     if len(opponents) == len(smash_queue)-1:
+                                        # checks for the number of people
                                         checking += 1
+                            # get next if they are the same
                             else:
                                 opponent_queue_pointer += 1
+                        # if the player has fought against everyone
                         else:
+                            # get next player
                             smash_queue_pointer += 1
                             checking += 1
+                            # if everyone has been checked
                             if checking == len(smash_queue) - 1:
                                 checking = 0
-                                mix_up += 1
-                                if mix_up == len(smash_queue):
-                                    mix_up = 1
+                                mix_up = 1
+                                # reset the opponents
                                 for fighter in smash_queue:
                                     fighter[3] = []
+                    # if the player is in past players
                     else:
+                        # get next player
                         smash_queue_pointer += 1
                         checking += 1
+                        # if everyone has been checked
                         if checking == len(smash_queue) - 1:
                             checking = 0
-                            mix_up += 1
-                            if mix_up == len(smash_queue):
-                                mix_up = 1
+                            mix_up = 1
+                            # reset the opponents
                             for fighter in smash_queue:
                                 fighter[3] = []
+
+            elif current_fighter[0] == "doubles":
+                ctx.send("come back to this....")
 
         # if flare == 0:
         #   if read[0] == "singles":
