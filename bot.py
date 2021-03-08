@@ -14,7 +14,10 @@ client = commands.Bot(command_prefix="*")
 players = {}
 smashers = []
 smash_queue = []
+mix_up = 1
+
 smash_queue_pointer = 0
+
 
 # ydl = youtube_dl.YoutubeDL({'outtmpl': '%(id)s%(ext)s'})
 # howdy ho
@@ -105,7 +108,7 @@ async def hello(ctx):
 
 
 @client.command()
-async def smash(ctx, condition, person = None):
+async def smash(ctx, condition, person=None):
     global smashers
     global smash_queue
     personCmd = ["add", "drop", "remove"]
@@ -116,30 +119,35 @@ async def smash(ctx, condition, person = None):
     elif condition == "roster":
         msg = ""
         for i in range(len(smashers)):
-            msg += f'@{smashers[i].name}'
+            msg += f'{smashers[i].name}'
             if i + 1 != len(smashers):
                 msg += ", "
         await ctx.send("Current smash roster: " + msg)
     elif condition in personCmd:
-        player = client.get_user(int (person[3 : len(person) - 1]))
+        player = client.get_user(int(person[3: len(person) - 1]))
         if player != None:
             if condition == "add":
-                smashers.append(player)
-                await ctx.send(f'@{player.name} was added to the roster!')
+                if player in smashers:
+                    await ctx.send(f'{player.name} is already in the roster...')
+                else:
+                    smashers.append(player)
+                    await ctx.send(f'{player.name} was added to the roster!')
             else:
                 if player in smashers:
                     smashers.remove(player)
-                    await ctx.send(f'@{player.name} was dropped from the roster. Please make a new fight queue to see the update.')
+                    await ctx.send(
+                        f'{player.name} was dropped from the roster. Please make a new fight queue to see the update.')
                 else:
-                    await ctx.send(f'@{player.name} isn\'t in the queue stupid!')
+                    await ctx.send(f'{player.name} isn\'t in the queue stupid!')
         else:
-            await ctx.send(f"User \"{person}\"doesn't exist. Mention one that does...")
+            await ctx.send(f"User \"{player.name}\"doesn't exist. Mention one that does...")
 
 
 @client.command()
 async def fight(ctx, fight_type):
     global smash_queue
     global smashers
+    smash_queue = []
     create = False
     if len(smashers) == 0:
         await ctx.send("Gotta add people to the roster in order to fight, retard (if we used the word)!")
@@ -154,10 +162,18 @@ async def fight(ctx, fight_type):
         # 1 on 1 fights
         if fight_type == "singles":
 
+            # BECK APPROACH
+
+            for fighter in smashers:
+                opponents = []
+                name_design = ["singles", fighter, False, opponents]
+                smash_queue.append(name_design)
+
+            # JOSH APPROACH
             # generate all combinations of pairings of fighters
-            for i in list(combinations(smashers, 2)):
-                i.insert(0, "singles")
-                smash_queue.append(i)
+            # for i in list(combinations(smashers, 2)):
+            # i.insert(0, "singles")
+            # smash_queue.append(i)
 
             create = True
 
@@ -167,27 +183,37 @@ async def fight(ctx, fight_type):
                 await ctx.send("You can't do doubles with less than 4 people!")
             else:
 
-                # generate all combinations of pairs of fighters
-                # in all sets of 4 fighters
-                for i in list(combinations(smashers, 4)):
-                    # inside each possible quadruple
+                # Beck Approach
 
-                    l = []
-
-                    for j in list(combinations(i, 2)):
-                        # inside each pair in quadruple
-
-                        for k in j:
-                            # each fighter instance in pair
-                            # flatten list and append
-                            l.append(k)
-                    
-                    for m in range(0, int(len(l) / 4)):
-                        # collect pairs from quadruple and append to queue
-                        smash_queue.append(["doubles", 
-                            l[2 * m], l[2 * m + 1], l[11 - (2 * m)], l[10 - (2 * m)]])
+                for fighter in smashers:
+                    partners = []
+                    opponents = []
+                    name_design = ["doubles", fighter, False, partners, opponents]
+                    smash_queue.append(name_design)
 
                 create = True
+                # Josh Approach
+                # generate all combinations of pairs of fighters
+                # in all sets of 4 fighters
+                # for i in list(combinations(smashers, 4)):
+                # inside each possible quadruple
+
+                # l = []
+
+                # for j in list(combinations(i, 2)):
+                # inside each pair in quadruple
+
+                # for k in j:
+                # each fighter instance in pair
+                # flatten list and append
+                # l.append(k)
+
+                # for m in range(0, int(len(l) / 4)):
+                # collect pairs from quadruple and append to queue
+                # smash_queue.append(["doubles",
+                #       l[2 * m], l[2 * m + 1], l[11 - (2 * m)], l[10 - (2 * m)]])
+
+                # create = True
 
         if create:
             random.shuffle(smash_queue)
@@ -210,74 +236,142 @@ async def next_fight(ctx):
                     "! Maybe the match up will be better for ",
                     "! Imagine thinking "]
     global smash_queue_pointer
+    global smash_queue
+    global mix_up
+    past_fighters = []
     flare = random.randint(0, 7)
+
+    # temp, remove after debug
+    flare = 8
+
     player = random.randint(0, 1)
-    read = smash_queue[smash_queue_pointer % len(smash_queue)]
+    current_fighter = smash_queue[smash_queue_pointer % len(smash_queue)]
     if not smash_queue:
         await ctx.send("Make sure the smash queue exists. Can't fight without one!")
     else:
-        if flare == 0:
-            if read[0] == "singles":
-                await ctx.send("Next up: " + read[1] + " VS " + read[2] + fight_flares[0] +
-                               read[player + 1] + " fights dirty!")
-            else:
-                if player == 1:
-                    await ctx.send("Next up: " + read[1] + " and " + read[2] + " VS " + read[3] +
-                                   " and " + read[4] + fight_flares[0] + read[1] + " and " + read[2] + " fight dirty!")
-                else:
-                    await ctx.send("Next up: " + read[1] + " and " + read[2] + " VS " + read[3] +
-                                   " and " + read[4] + fight_flares[0] + read[3] + " and " + read[4] + " fight dirty!")
-        elif flare == 1:
-            if read[0] == "singles":
-                await ctx.send("Next up: " + read[1] + " VS " + read[2] + " ! " + read[player + 1] + fight_flares[1])
-            else:
-                if player == 1:
-                    await ctx.send("Next up: " + read[1] + " and " + read[2] + " VS " + read[3] +
-                                   " and " + read[4] + " ! " + + read[1] + " and " + read[2] + fight_flares[1])
-                else:
-                    await ctx.send("Next up: " + read[1] + " and " + read[2] + " VS " + read[3] +
-                                   " and " + read[4] + " ! " + read[3] + " and " + read[4] + fight_flares[1])
-        elif flare == 2:
-            if read[0] == "singles":
-                await ctx.send("Next up: " + read[1] + " VS " + read[2] + fight_flares[2] +
-                               read[player + 1] + " wins.")
-            else:
-                if player == 1:
-                    await ctx.send("Next up: " + read[1] + " and " + read[2] + " VS " + read[3] +
-                                   " and " + read[4] + fight_flares[2] + read[1] + " and " + read[2] + " win.")
-                else:
-                    await ctx.send("Next up: " + read[1] + " and " + read[2] + " VS " + read[3] +
-                                   " and " + read[4] + fight_flares[2] + read[3] + " and " + read[4] + " win.")
-        elif flare == 6:
-            if read[0] == "singles":
-                await ctx.send("Next up: " + read[1] + " VS " + read[2] + fight_flares[6] +
-                               read[player + 1] + " next time.")
-            else:
-                if player == 1:
-                    await ctx.send("Next up: " + read[1] + " and " + read[2] + " VS " + read[3] +
-                                   " and " + read[4] + fight_flares[6] + read[1] + " and " + read[2] + " next time.")
-                else:
-                    await ctx.send("Next up: " + read[1] + " and " + read[2] + " VS " + read[3] +
-                                   " and " + read[4] + fight_flares[6] + read[3] + " and " + read[4] + " next time.")
-        elif flare == 7:
-            if read[0] == "singles":
-                await ctx.send("Next up: " + read[1] + " VS " + read[2] + fight_flares[7] +
-                               read[player + 1] + " will win this one.")
-            else:
-                if player == 1:
-                    await ctx.send("Next up: " + read[1] + " and " + read[2] + " VS " + read[3] +
-                                   " and " + read[4] + fight_flares[7] + read[1] + " and " + read[2] +
-                                   "  will win this one.")
-                else:
-                    await ctx.send("Next up: " + read[1] + " and " + read[2] + " VS " + read[3] +
-                                   " and " + read[4] + fight_flares[7] + read[3] + " and " + read[
-                                       4] + "  will win this one.")
-        else:
-            if read[0] == "singles":
-                await ctx.send("Next up: " + read[1] + " VS " + read[2] + fight_flares[flare])
-            else:
-                await ctx.send("Next up: " + read[1] + " and " + read[2] + " VS " + read[3] +
-                               " and " + read[4] + fight_flares[flare])
+        if flare == 8:
+            for fighters in smash_queue:
+                if fighters[2]:
+                    past_fighters.append(fighters)
+            if len(past_fighters) == len(smash_queue):
+                for fighters in smash_queue:
+                    fighters[2] = False
+                past_fighters = []
+            if current_fighter[0] == "singles":
+                condition = True
+                checking = 0
+                opponent_queue_pointer = smash_queue_pointer
+                while condition:
+                    current_fighter = smash_queue[smash_queue_pointer % len(smash_queue)]
+                    if current_fighter not in past_fighters:
+                        if len(current_fighter[3]) != len(smash_queue)-1:
+                            opponent_queue_pointer = opponent_queue_pointer + mix_up
+                            attempted_fight = smash_queue[opponent_queue_pointer % len(smash_queue)]
+                            while attempted_fight in past_fighters:
+                                opponent_queue_pointer = opponent_queue_pointer + 1
+                                attempted_fight = smash_queue[opponent_queue_pointer % len(smash_queue)]
+                                if attempted_fight[1] == current_fighter[1]:
+                                    opponent_queue_pointer = opponent_queue_pointer + 1
+                                    attempted_fight = smash_queue[opponent_queue_pointer % len(smash_queue)]
+                            if attempted_fight[1] != current_fighter[1]:
+                                opponents = current_fighter[3]
+                                if attempted_fight[1] not in opponents:
+                                    current_fighter[3].append(attempted_fight[1])
+                                    attempted_fight[3].append(current_fighter[1])
+                                    current_fighter[2] = True
+                                    attempted_fight[2] = True
+                                    await ctx.send("This step of the test matched up " + current_fighter[1].mention + " versus " +
+                                                   attempted_fight[1].mention)
+                                    condition = False
+                                    checking = 0
+                                elif attempted_fight[1] in current_fighter[3]:
+                                    if len(opponents) == len(smash_queue)-1:
+                                        checking += 1
+                            else:
+                                opponent_queue_pointer += 1
+                        else:
+                            smash_queue_pointer += 1
+                            checking += 1
+                            if checking == len(smash_queue) - 1:
+                                checking = 0
+                                mix_up += 1
+                                if mix_up == len(smash_queue):
+                                    mix_up = 1
+                                for fighter in smash_queue:
+                                    fighter[3] = []
+                    else:
+                        smash_queue_pointer += 1
+                        checking += 1
+                        if checking == len(smash_queue) - 1:
+                            checking = 0
+                            mix_up += 1
+                            if mix_up == len(smash_queue):
+                                mix_up = 1
+                            for fighter in smash_queue:
+                                fighter[3] = []
+
+        # if flare == 0:
+        #   if read[0] == "singles":
+        #      await ctx.send("Next up: " + read[1].name + " VS " + read[2].name + fight_flares[0] +
+        #                    read[player + 1] + " fights dirty!")
+        # else:
+        #   if player == 1:
+        #      await ctx.send("Next up: " + read[1] + " and " + read[2] + " VS " + read[3] +
+        #                    " and " + read[4] + fight_flares[0] + read[1] + " and " + read[2] + " fight dirty!")
+        # else:
+        #   await ctx.send("Next up: " + read[1] + " and " + read[2] + " VS " + read[3] +
+        #                 " and " + read[4] + fight_flares[0] + read[3] + " and " + read[4] + " fight dirty!")
+        # elif flare == 1:
+        #   if read[0] == "singles":
+        #      await ctx.send("Next up: " + read[1] + " VS " + read[2] + " ! " + read[player + 1] + fight_flares[1])
+        # else:
+        #    if player == 1:
+        #       await ctx.send("Next up: " + read[1] + " and " + read[2] + " VS " + read[3] +
+        #                     " and " + read[4] + " ! " + + read[1] + " and " + read[2] + fight_flares[1])
+        # else:
+        #    await ctx.send("Next up: " + read[1] + " and " + read[2] + " VS " + read[3] +
+        #                  " and " + read[4] + " ! " + read[3] + " and " + read[4] + fight_flares[1])
+        # elif flare == 2:
+        #   if read[0] == "singles":
+        #      await ctx.send("Next up: " + read[1] + " VS " + read[2] + fight_flares[2] +
+        #                    read[player + 1] + " wins.")
+        # else:
+        #   if player == 1:
+        #      await ctx.send("Next up: " + read[1] + " and " + read[2] + " VS " + read[3] +
+        #                    " and " + read[4] + fight_flares[2] + read[1] + " and " + read[2] + " win.")
+        # else:
+        #   await ctx.send("Next up: " + read[1] + " and " + read[2] + " VS " + read[3] +
+        #                 " and " + read[4] + fight_flares[2] + read[3] + " and " + read[4] + " win.")
+        # elif flare == 6:
+        #   if read[0] == "singles":
+        #      await ctx.send("Next up: " + read[1] + " VS " + read[2] + fight_flares[6] +
+        #                    read[player + 1] + " next time.")
+        # else:
+        #   if player == 1:
+        #      await ctx.send("Next up: " + read[1] + " and " + read[2] + " VS " + read[3] +
+        #                    " and " + read[4] + fight_flares[6] + read[1] + " and " + read[2] + " next time.")
+        # else:
+        #   await ctx.send("Next up: " + read[1] + " and " + read[2] + " VS " + read[3] +
+        #                 " and " + read[4] + fight_flares[6] + read[3] + " and " + read[4] + " next time.")
+        # elif flare == 7:
+        #   if read[0] == "singles":
+        #      await ctx.send("Next up: " + read[1] + " VS " + read[2] + fight_flares[7] +
+        #                    read[player + 1] + " will win this one.")
+        # else:
+        #   if player == 1:
+        #      await ctx.send("Next up: " + read[1] + " and " + read[2] + " VS " + read[3] +
+        #                    " and " + read[4] + fight_flares[7] + read[1] + " and " + read[2] +
+        #                   "  will win this one.")
+        # else:
+        #   await ctx.send("Next up: " + read[1] + " and " + read[2] + " VS " + read[3] +
+        #                 " and " + read[4] + fight_flares[7] + read[3] + " and " + read[
+        #                    4] + "  will win this one.")
+        # else:
+        #   if read[0] == "singles":
+        #      await ctx.send("Next up: " + read[1] + " VS " + read[2] + fight_flares[flare])
+        # else:
+        #    await ctx.send("Next up: " + read[1] + " and " + read[2] + " VS " + read[3] +
+        #                  " and " + read[4] + fight_flares[flare])
         smash_queue_pointer += 1
 
 
@@ -325,12 +419,14 @@ async def leave(ctx):
     server = ctx.message.guild.voice_client
     await server.disconnect()
 
+
 @client.command(aliases=["quit", "q"])
 @commands.has_permissions(administrator=True)
 async def close(ctx):
     await ctx.send("😏")
     await client.close()
     print("Good riddance")
+
 
 # @client.command()
 # async def play(ctx, url):
