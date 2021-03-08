@@ -420,12 +420,39 @@ async def leave(ctx):
     await server.disconnect()
 
 
-@client.command(aliases=["quit", "q"])
-@commands.has_permissions(administrator=True)
+@client.command()
+async def dev(ctx, condition, person):
+    try:
+        user = client.get_user(int (person[3 : len(person) - 1]))
+    except ValueError:
+        await ctx.send(f'User "{person}" doesn\'t exist. Mention one that does...')
+
+    if user != None:
+        devs = json.loads(open("cogs/devs.json", "r").read())
+        if condition == "add":
+            devs["devs"].append(user.id)
+            await ctx.send(f'@{user.name} has been hired.')
+        elif condition == "remove":
+            if user.id in devs["devs"]:
+                devs["devs"].remove(user.id)
+                await ctx.send(f'@{user.name} has been fired.')
+            else:
+                await ctx.send(f'@{user.name} isn\'t on the payroll')
+        else:
+            await ctx.send("Please either add or remove a dev")
+        open("cogs/devs.json", "w").write(json.dumps(devs))
+    else:
+        await ctx.send(f"User \"{person}\"doesn't exist. Mention one that does...")
+
+@client.command(aliases=["quit", "q", "kil", "kill", "die"])
 async def close(ctx):
-    await ctx.send("😏")
-    await client.close()
-    print("Good riddance")
+    devs = json.loads(open("cogs/devs.json", "r").read()).get("devs")
+    if ctx.author.id in devs:
+        await ctx.send("😏")
+        await client.close()
+        print("Good riddance")
+    else:
+        await ctx.send("**you lack the power to shut me down**")
 
 
 # @client.command()
