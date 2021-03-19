@@ -274,6 +274,8 @@ async def next_fight(ctx):
 
                             # if the competitor has already fought
                             while attempted_fight in past_fighters:
+                                if len(past_fighters) == len(smash_queue)-1:
+                                    break
                                 opponent_queue_pointer = opponent_queue_pointer + 1
                                 attempted_fight = smash_queue[opponent_queue_pointer % len(smash_queue)]
                                 if attempted_fight[1] == current_fighter[1]:
@@ -288,8 +290,23 @@ async def next_fight(ctx):
                                     # add fighters to each others opponents and update fought to true
                                     current_fighter[3].append(attempted_fight[1])
                                     attempted_fight[3].append(current_fighter[1])
+                                    temp_length = len(smash_queue)
                                     current_fighter[2] = True
                                     attempted_fight[2] = True
+
+                                    # will reset he system to allow for no repeat is odd number of people
+                                    if len(past_fighters) == len(smash_queue)-1:
+                                        past_fighters = []
+                                        # add players that played to list
+                                        for fighters in smash_queue:
+                                            if fighters[2]:
+                                                past_fighters.append(fighters)
+                                        # if everyone in list, reset everything
+                                        if len(past_fighters) == len(smash_queue):
+                                            for fighters in smash_queue:
+                                                fighters[2] = False
+                                            past_fighters = []
+                                            attempted_fight[2] = True
                                     # send
                                     await ctx.send("This step of the test matched up " + current_fighter[1].mention + " versus " +
                                                    attempted_fight[1].mention)
