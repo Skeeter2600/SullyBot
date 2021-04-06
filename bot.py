@@ -68,16 +68,19 @@ async def on_ready():
     print("I'm back, bitches")
 
 
+# --------------------------------------------------------------------------------------------------------------------
 @client.event
 async def on_member_join(member):
     print(f'{member} has joined the server. Get the chalice ready, NotSoBot.')
 
 
+# --------------------------------------------------------------------------------------------------------------------
 @client.event
 async def on_member_remove(member):
     print("Hasta la vista, " + f'{member}')
 
 
+# --------------------------------------------------------------------------------------------------------------------
 @client.command()
 async def ping(ctx):
     if client.latency * 1000 > 500:
@@ -86,23 +89,27 @@ async def ping(ctx):
         await ctx.send(f' You good ( {round(client.latency * 1000)} ms )')
 
 
+# --------------------------------------------------------------------------------------------------------------------
 @client.command()
 async def pong(ctx):
     await ctx.send("Ping!!!!!!!!!")
 
 
+# --------------------------------------------------------------------------------------------------------------------
 @client.command()
 async def advise(ctx, *, question):
     answers = json.loads(open("responses/questions.json", "r").read()).get("answers")
     await ctx.send(f'Question: {question}\nAnswer: {random.choice(answers)}')
 
 
+# --------------------------------------------------------------------------------------------------------------------
 @client.command(aliases=['hi'])
 async def hello(ctx):
     hellos = json.loads(open("responses/hellos.json", "r").read()).get("hellos")
     await ctx.send(random.choice(hellos))
 
 
+# --------------------------------------------------------------------------------------------------------------------
 @client.command()
 async def smash(ctx, condition, person=None):
     global smashers
@@ -139,6 +146,7 @@ async def smash(ctx, condition, person=None):
             await ctx.send(f"User \"{player.name}\"doesn't exist. Mention one that does...")
 
 
+# --------------------------------------------------------------------------------------------------------------------
 @client.command()
 async def fight(ctx, fight_type):
     global smash_queue
@@ -158,18 +166,10 @@ async def fight(ctx, fight_type):
         # 1 on 1 fights
         if fight_type == "singles":
 
-            # BECK APPROACH
-
             for fighter in smashers:
                 opponents = []
                 name_design = ["singles", fighter, False, opponents]
                 smash_queue.append(name_design)
-
-            # JOSH APPROACH
-            # generate all combinations of pairings of fighters
-            # for i in list(combinations(smashers, 2)):
-            # i.insert(0, "singles")
-            # smash_queue.append(i)
 
             create = True
 
@@ -179,8 +179,6 @@ async def fight(ctx, fight_type):
                 await ctx.send("You can't do doubles with less than 4 people!")
             else:
 
-                # Beck Approach
-
                 for fighter in smashers:
                     partners = []
                     opponents = []
@@ -188,28 +186,6 @@ async def fight(ctx, fight_type):
                     smash_queue.append(name_design)
 
                 create = True
-                # Josh Approach
-                # generate all combinations of pairs of fighters
-                # in all sets of 4 fighters
-                # for i in list(combinations(smashers, 4)):
-                # inside each possible quadruple
-
-                # l = []
-
-                # for j in list(combinations(i, 2)):
-                # inside each pair in quadruple
-
-                # for k in j:
-                # each fighter instance in pair
-                # flatten list and append
-                # l.append(k)
-
-                # for m in range(0, int(len(l) / 4)):
-                # collect pairs from quadruple and append to queue
-                # smash_queue.append(["doubles",
-                #       l[2 * m], l[2 * m + 1], l[11 - (2 * m)], l[10 - (2 * m)]])
-
-                # create = True
 
         if create:
             random.shuffle(smash_queue)
@@ -221,6 +197,7 @@ async def fight(ctx, fight_type):
             await ctx.send("Add people so there are at least 4 people in the roster.")
 
 
+# --------------------------------------------------------------------------------------------------------------------
 @client.command()
 async def next_fight(ctx):
     fight_flares = ["! I heard that ",
@@ -267,14 +244,14 @@ async def next_fight(ctx):
 
                     if current_fighter not in past_fighters:
                         # if player hasn't fought everyone
-                        if len(current_fighter[3]) != len(smash_queue)-1:
+                        if len(current_fighter[3]) != len(smash_queue) - 1:
                             # add the mix up value to pointer and get the next competitor
                             opponent_queue_pointer = opponent_queue_pointer + mix_up
                             attempted_fight = smash_queue[opponent_queue_pointer % len(smash_queue)]
 
                             # if the competitor has already fought
                             while attempted_fight in past_fighters:
-                                if len(past_fighters) == len(smash_queue)-1:
+                                if len(past_fighters) == len(smash_queue) - 1:
                                     break
                                 opponent_queue_pointer = opponent_queue_pointer + 1
                                 attempted_fight = smash_queue[opponent_queue_pointer % len(smash_queue)]
@@ -290,12 +267,11 @@ async def next_fight(ctx):
                                     # add fighters to each others opponents and update fought to true
                                     current_fighter[3].append(attempted_fight[1])
                                     attempted_fight[3].append(current_fighter[1])
-                                    temp_length = len(smash_queue)
                                     current_fighter[2] = True
                                     attempted_fight[2] = True
 
                                     # will reset he system to allow for no repeat is odd number of people
-                                    if len(past_fighters) == len(smash_queue)-1:
+                                    if len(past_fighters) == len(smash_queue) - 1:
                                         past_fighters = []
                                         # add players that played to list
                                         for fighters in smash_queue:
@@ -307,16 +283,19 @@ async def next_fight(ctx):
                                                 fighters[2] = False
                                             past_fighters = []
                                             attempted_fight[2] = True
+                                    # make image here
+                                    # ------------
                                     # send
-                                    await ctx.send("This step of the test matched up " + current_fighter[1].mention + " versus " +
-                                                   attempted_fight[1].mention)
+                                    await ctx.send(
+                                        "This step of the test matched up " + current_fighter[1].mention + " versus " +
+                                        attempted_fight[1].mention)
                                     # break while
                                     condition = False
                                     checking = 0
                                 # if the opponent has already been played against
                                 elif attempted_fight[1] in current_fighter[3]:
                                     # get next competitor
-                                    if len(opponents) == len(smash_queue)-1:
+                                    if len(opponents) == len(smash_queue) - 1:
                                         # checks for the number of people
                                         checking += 1
                             # get next if they are the same
@@ -342,13 +321,223 @@ async def next_fight(ctx):
                         # if everyone has been checked
                         if checking == len(smash_queue) - 1:
                             checking = 0
-                            mix_up = 1
+                            mix_up += 1
                             # reset the opponents
                             for fighter in smash_queue:
                                 fighter[3] = []
-
+            # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
             elif current_fighter[0] == "doubles":
-                ctx.send("come back to this....")
+                condition = True
+                checking = 0
+                opponent_queue_pointer = smash_queue_pointer
+                used_people = []
+                finish_condition = False
+                while condition:
+                    # get the current fighter
+                    current_fighter = smash_queue[smash_queue_pointer % len(smash_queue)]
+                    used_people.append(current_fighter[1])
+                    print(current_fighter[1].name + ": fighter FINAL")  # for debug purposes
+
+                    if current_fighter[1] not in past_fighters and len(current_fighter[3]) < len(smash_queue)-1:
+                        teammate_loop_counter = 0
+                        teammate_loop = False
+                        while not teammate_loop:
+                            # add the mix up value to pointer and get the team mate
+                            opponent_queue_pointer = opponent_queue_pointer + mix_up
+                            attempted_teammate = smash_queue[opponent_queue_pointer % len(smash_queue)]
+                            # if the teammate has already fought
+                            while attempted_teammate[1] in past_fighters or attempted_teammate[1] in used_people or\
+                                    attempted_teammate[1] in current_fighter[3]:
+                                print(attempted_teammate[1].name)  # for debug purposes
+
+                                opponent_queue_pointer = opponent_queue_pointer + 1
+                                attempted_teammate = smash_queue[opponent_queue_pointer % len(smash_queue)]
+                            print(attempted_teammate[1].name + ": FINAL")  # for debug purposes
+                            used_people.append(attempted_teammate[1])
+
+                            attempted_opponent_2 = []  # just to keep the code looking clean (no warnings)
+                            opponent_grouping = []     # just to keep the code looking clean (no warnings)
+                            team_grouping = []         # just to keep the code looking clean (no warnings)
+                            match_up = False
+
+# --------------------------------- PROBLEM IS FROM HERE ------------------------------------------
+                            while not match_up:
+
+                                # add the mix up value to pointer and get the first opponent and set up the loop for it
+                                opponent_queue_pointer = opponent_queue_pointer + mix_up + 1
+                                attempted_opponent_1 = smash_queue[opponent_queue_pointer % len(smash_queue)]
+                                temp_used_people = []
+                                for person in used_people:
+                                    temp_used_people.append(person)
+                                continue_condition = True
+
+                                # if the opponent 1 has already fought
+                                while attempted_opponent_1[1] in past_fighters or attempted_opponent_1[1] in temp_used_people:
+                                    print(attempted_opponent_1[1].name + ": opp_1")  # for debug purposes
+                                    opponent_queue_pointer = opponent_queue_pointer + 1
+                                    attempted_opponent_1 = smash_queue[opponent_queue_pointer % len(smash_queue)]
+                                print(attempted_opponent_1[1].name + ": opp_1")  # for debug purposes
+                                temp_used_people.append(attempted_opponent_1[1])
+
+                                # add the mix up value to pointer and get the second opponent
+                                opponent_queue_pointer = opponent_queue_pointer + mix_up + 1
+                                attempted_opponent_2 = smash_queue[opponent_queue_pointer % len(smash_queue)]
+                                attempted_opponent_1_counter = 0
+
+                                # if the opponent 2 has already fought or if opponent 2 has gone up with everyone
+                                while attempted_opponent_2[1] in past_fighters or attempted_opponent_2[1] in temp_used_people or\
+                                        [attempted_opponent_1[1], attempted_opponent_2[1]] in current_fighter[4] or\
+                                        [attempted_opponent_1[1], attempted_opponent_2[1]] in attempted_teammate[4] or\
+                                        attempted_opponent_2[1] in attempted_opponent_1[3]:
+
+                                    attempted_opponent_1_counter += 1
+                                    print(attempted_opponent_2[1].name + ": opp_2")  # for debug purposes
+                                    opponent_queue_pointer = opponent_queue_pointer + 1
+                                    attempted_opponent_2 = smash_queue[opponent_queue_pointer % len(smash_queue)]
+
+                                    if attempted_opponent_1_counter == len(smash_queue):
+                                        continue_condition = False
+                                        break
+
+                                print(attempted_opponent_2[1].name + ": opp_2")  # for debug purposes
+                                temp_used_people.append(attempted_opponent_2[1])
+
+# --------------------------------------- TO HERE --------------------------------------
+
+                                # if the system is ready to continue to the output
+                                if continue_condition:
+                                    print(attempted_opponent_1[1].name + ": FINAL")  # for debug purposes
+                                    print(attempted_opponent_2[1].name + ": FINAL")  # for debug purposes
+                                    opponent_grouping = [[attempted_opponent_1[1], attempted_opponent_2[1]],
+                                                         [attempted_opponent_2[1], attempted_opponent_1[1]]]
+                                    team_grouping = [[attempted_teammate[1], current_fighter[1]],
+                                                     [current_fighter[1], attempted_teammate[1]]]
+                                    # if a player has faced the opposing team
+                                    next_step = True
+                                    for grouping in opponent_grouping:
+                                        if grouping in current_fighter[4]:
+                                            next_step = False
+                                        if grouping in attempted_teammate[4]:
+                                            next_step = False
+                                    for grouping in team_grouping:
+                                        if grouping in attempted_opponent_2[4]:
+                                            next_step = False
+                                        if grouping in attempted_opponent_1[4]:
+                                            next_step = False
+                                    if next_step:
+                                        step_2 = True
+                                        for grouping in opponent_grouping:
+                                            if grouping in current_fighter[3]:
+                                                step_2 = False
+                                            if grouping in attempted_teammate[3]:
+                                                step_2 = False
+                                        for grouping in team_grouping:
+                                            if grouping in attempted_opponent_2[3]:
+                                                step_2 = False
+                                            if grouping in attempted_opponent_1[3]:
+                                                step_2 = False
+                                        if step_2:
+                                            match_up = True
+                                            teammate_loop = True
+                                            finish_condition = True
+                                else:
+                                    teammate_loop_counter += 1
+                                    if teammate_loop_counter == len(smash_queue):
+                                        used_people.remove(attempted_teammate[1])
+                                        break
+
+# ------------------------- PROBLEM IS IN HERE SOMEWHERE -------------------
+# ---------------------------- AND ENDS BY HERE ------------------------------------
+                        if finish_condition:
+                            # add fighters to each others teammates
+                            current_fighter[3].append(attempted_teammate[1])
+                            attempted_teammate[3].append(current_fighter[1])
+                            attempted_opponent_1[3].append(attempted_opponent_2[1])
+                            attempted_opponent_2[3].append(attempted_opponent_1[1])
+                            # add opponents to each all opponent groupings
+                            current_fighter[4].append(opponent_grouping)
+                            attempted_teammate[4].append(opponent_grouping)
+                            attempted_opponent_1[4].append(team_grouping)
+                            attempted_opponent_2[4].append(team_grouping)
+                            # update if they have gone
+                            current_fighter[2] = True
+                            attempted_teammate[2] = True
+                            attempted_opponent_1[2] = True
+                            attempted_opponent_2[2] = True
+
+                            for fighters in smash_queue:
+                                if fighters[2]:
+                                    past_fighters.append(fighters)
+
+                            # will reset he system to allow for no repeat is odd number of people
+                            if len(past_fighters) == len(smash_queue):
+                                past_fighters = []
+                                # add players that played to list
+                                for fighters in smash_queue:
+                                    fighters[2] = False
+                            # if everyone in list, reset everything
+                            if len(past_fighters) == len(smash_queue)-3:
+                                for fighters in smash_queue:
+                                    fighters[2] = False
+                                past_fighters = []
+                                attempted_teammate[2] = True
+                                attempted_opponent_1[2] = True
+                                attempted_opponent_2[2] = True
+                            if len(past_fighters) == len(smash_queue)-2:
+                                for fighters in smash_queue:
+                                    fighters[2] = False
+                                past_fighters = []
+                                attempted_opponent_1[2] = True
+                                attempted_opponent_2[2] = True
+                            if len(past_fighters) == len(smash_queue)-1:
+                                for fighters in smash_queue:
+                                    fighters[2] = False
+                                past_fighters = []
+                                attempted_opponent_2[2] = True
+                            # break while
+                            condition = False
+                            checking = 0
+                            used_people = []
+                            clear_condition = True
+                            for person in smash_queue:
+                                if len(person[3]) != len(smash_queue)-1:
+                                    clear_condition = False
+                            if clear_condition:
+                                for person in smash_queue:
+                                    person[3] = []
+                                    person[4] = []
+                            # send
+                            print("------------------------------------------")
+                            await ctx.send(
+                                "This step of the test matched up " + current_fighter[1].mention +
+                                " and " + attempted_teammate[1].mention + " versus " +
+                                attempted_opponent_1[1].mention + " and " +
+                                attempted_opponent_2[1].mention)
+                        else:
+                            # get next player
+                            smash_queue_pointer += 1
+                            checking += 1
+                            # if everyone has been checked
+                            if checking == len(smash_queue):
+                                checking = 0
+                                mix_up += 1
+                                used_people = []
+                                # reset the opponents
+                                for fighter in smash_queue:
+                                    fighter[3] = []
+                    # if the player is in past players
+                    else:
+                        # get next player
+                        smash_queue_pointer += 1
+                        checking += 1
+                        # if everyone has been checked
+                        if checking == len(smash_queue):
+                            checking = 0
+                            mix_up += 1
+                            used_people = []
+                            # reset the opponents
+                            for fighter in smash_queue:
+                                fighter[3] = []
 
         # if flare == 0:
         #   if read[0] == "singles":
@@ -415,6 +604,7 @@ async def next_fight(ctx):
         smash_queue_pointer += 1
 
 
+# --------------------------------------------------------------------------------------------------------------------
 @client.command()
 async def image(ctx, message):
     if message == "🥺":
@@ -438,32 +628,37 @@ async def image(ctx, message):
             await ctx.send(picture)
 
 
+# --------------------------------------------------------------------------------------------------------------------
 @client.command()
 async def start(ctx, extension):
     client.load_extension(f'cogs.{extension}')
 
 
+# --------------------------------------------------------------------------------------------------------------------
 @client.command()
 async def end(ctx, extension):
     client.unload_extension(f'cogs.{extension}')
 
 
+# --------------------------------------------------------------------------------------------------------------------
 @client.command()
 async def join(ctx):
     channel = ctx.author.voice.channel
     await channel.connect()
 
 
+# --------------------------------------------------------------------------------------------------------------------
 @client.command(aliases=['disconnect'])
 async def leave(ctx):
     server = ctx.message.guild.voice_client
     await server.disconnect()
 
 
+# --------------------------------------------------------------------------------------------------------------------
 @client.command()
 async def dev(ctx, condition, person):
     try:
-        user = client.get_user(int (person[3 : len(person) - 1]))
+        user = client.get_user(int(person[3: len(person) - 1]))
     except ValueError:
         await ctx.send(f'User "{person}" doesn\'t exist. Mention one that does...')
 
@@ -483,6 +678,7 @@ async def dev(ctx, condition, person):
         open("cogs/devs.json", "w").write(json.dumps(devs))
     else:
         await ctx.send(f"User \"{person}\"doesn't exist. Mention one that does...")
+
 
 @client.command(aliases=["quit", "q", "kil", "kill", "die"])
 async def close(ctx):
