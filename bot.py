@@ -5,7 +5,7 @@ from discord.ext import commands
 import json
 import smash
 
-TOKEN = json.loads(open("cogs/TOKEN_ID.json", "r").read()).get("TOKEN")
+TOKEN = json.loads(open("json/TOKEN_ID.json", "r").read()).get("TOKEN")
 
 client = commands.Bot(command_prefix="*")
 players = {}
@@ -665,7 +665,7 @@ async def dev(ctx, condition, person):
         await ctx.send(f'User "{person}" doesn\'t exist. Mention one that does...')
 
     if user != None:
-        devs = json.loads(open("cogs/devs.json", "r").read())
+        devs = json.loads(open("json/devs.json", "r").read())
         if condition == "add":
             devs["devs"].append(user.id)
             await ctx.send(f'@{user.name} has been hired.')
@@ -677,14 +677,14 @@ async def dev(ctx, condition, person):
                 await ctx.send(f'@{user.name} isn\'t on the payroll')
         else:
             await ctx.send("Please either add or remove a dev")
-        open("cogs/devs.json", "w").write(json.dumps(devs))
+        open("json/devs.json", "w").write(json.dumps(devs))
     else:
         await ctx.send(f"User \"{person}\"doesn't exist. Mention one that does...")
 
 
 @client.command(aliases=["quit", "q", "kil", "kill", "die"])
 async def close(ctx):
-    devs = json.loads(open("cogs/devs.json", "r").read()).get("devs")
+    devs = json.loads(open("json/devs.json", "r").read()).get("devs")
     if ctx.author.id in devs:
         await ctx.send("😏")
         await client.close()
