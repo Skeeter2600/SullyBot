@@ -3,6 +3,7 @@ import random
 # import youtube_dl
 from discord.ext import commands
 import json
+import smash
 
 TOKEN = json.loads(open("cogs/TOKEN_ID.json", "r").read()).get("TOKEN")
 
@@ -10,6 +11,7 @@ client = commands.Bot(command_prefix="*")
 players = {}
 smashers = []
 smash_queue = []
+playersPerGame = 2
 mix_up = 1
 
 smash_queue_pointer = 0
