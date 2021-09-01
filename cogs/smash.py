@@ -13,7 +13,7 @@ class Fighter():
     FOUGHTWEIGHT = 0.6
     TEAMEDWEIGHT = 0.5
 
-    def __init__(self, player, players):
+    def __init__(self, player, players : list):
         self.__user = player
         self.fought = dict()
         self.teamed = dict()
@@ -53,29 +53,48 @@ class Fighters(ABC):
     # currentQueue = []   # Container for list of fighters playing in current game
     # MAXNOPLAY = 2       # Maximum number of games a player can sit out
 
-    def __init__(self, players):
+    def __init__(self, players : list):
         self.currentGame = 0
         self.loadout = []
         self.currentQueue = []
+        self.lastGames = []
 
         for i in players:
             self.loadout.append(Fighter(i, players))
 
+        # Shuffles so the actual queue is potentially different from the one that is inputted
         random.shuffle(self.loadout)
 
         # self.currentQueue.clear()
 
-    # def refreshLastGames(self, lastGame):
-    #     self.lastGames.append(lastGame)
-    #     if len(self.lastGames) > 4:
-    #         self.lastGames.pop(0)
+    # Refreshes the last 3 games being stored
+    def refreshLastGames(self, lastGame : list):
+        self.lastGames.append(lastGame)
+        if len(self.lastGames) > 3:
+            self.lastGames.pop(0)
+
+    # Checks whether a potential queue is present in the last games being stored
+    def checkLastGames(self, q : list):
+        for game in self.lastGames:
+            c = 0
+            if len(game) == len(q):
+                for player in game:
+                    if player in q:
+                        c += 1
+                if c == len(game):
+                    return True
+                else:
+                    return False
+            else:
+                return False
+
 
     @abstractmethod
     def update(self):
         pass
     
     @abstractmethod
-    def generate(self):
+    def generate(self) -> list:
         pass
 
 
@@ -84,12 +103,12 @@ class Fighters(ABC):
 class Singles(Fighters):
     fightersPerGame = 0
 
-    def __init__(self, players, playersPerGame):
+    def __init__(self, players : list, playersPerGame : int):
         super().__init__(players)
         self.fightersPerGame = playersPerGame
 
 
-    def generate(self):
+    def generate(self) -> list:
         self.currentQueue.clear() #clears the current queue
         print("Current Round: " + str(self.currentGame))
 
@@ -107,12 +126,9 @@ class Singles(Fighters):
             if i.getFoughtScore() == preQ[-1].getFoughtScore() or len(preQ) < self.fightersPerGame:
                 preQ.append(i)
 
-        random.shuffle(preQ)
+        pQ = self.__tieBreak(preQ[:])
 
-        counter = 1
-        while len(self.currentQueue) < self.fightersPerGame:
-            self.currentQueue.append(preQ[counter])
-            counter += 1
+        self.currentQueue.extend(pQ)
 
         self.update()
 
@@ -126,7 +142,28 @@ class Singles(Fighters):
                     i.fought[j.getUser()] += 1
             i.lastPlayed = self.currentGame
 
+        self.refreshLastGames(self.currentQueue[:])
+
         self.currentGame += 1
+
+
+    def __tieBreak(self, filtered : list) -> list:
+        random.shuffle(filtered)
+
+        tempQ = []
+
+        fitSet = False
+        c = 0
+        maxLoop = 5 # <- controls the number of iterations allowed to find new lineup
+
+        while not fitSet and c < maxLoop:
+            tempQ = filtered
+            final = tempQ[ : self.fightersPerGame - 1]
+            fitSet = self.checkLastGames(final)
+            c += 1
+
+        return final
+
                 
 
 
@@ -134,7 +171,7 @@ class Singles(Fighters):
 class Doubles(Fighters):
     FIGHTERSPERGAME = 4
 
-    def __init__(self, players):
+    def __init__(self, players : list):
         super().__init__(players)
 
     def __breakTieTeam(self, target, queue):
@@ -166,7 +203,7 @@ class Doubles(Fighters):
         return random.choice(pQ)
 
 
-    def generate(self):
+    def generate(self) -> list:
         self.currentQueue.clear() #clears the current queue
         print("Current Round: " + str(self.currentGame))
 
