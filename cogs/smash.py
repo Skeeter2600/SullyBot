@@ -10,11 +10,11 @@ import random
 # Class for Each Fighter in the Queue
 class Fighter():
     PLAYEDWEIGHT = 1.0
-    FOUGHTWEIGHT = 0.5
+    FOUGHTWEIGHT = 0.6
     TEAMEDWEIGHT = 0.5
 
     def __init__(self, player, players):
-        self.user = player
+        self.__user = player
         self.fought = dict()
         self.teamed = dict()
         self.lastPlayed = 0
@@ -22,23 +22,26 @@ class Fighter():
         self.__ts = 0.0
         
         for i in players:
-            if i != self.user:
+            if i != self.__user:
                 self.fought[i] = 0
                 self.teamed[i] = 0
 
     def foughtScore(self, player):
-        self.__fs = (self.lastPlayed * self.PLAYEDWEIGHT) + (self.fought[player.user] * self.FOUGHTWEIGHT)
+        self.__fs = (self.lastPlayed * self.PLAYEDWEIGHT) + (self.fought[player.getUser()] * self.FOUGHTWEIGHT)
         return self.__fs
 
     def getFoughtScore(self):
         return self.__fs
 
     def teamScore(self, player):
-        self.__ts = (self.lastPlayed * self.PLAYEDWEIGHT) + (self.teamed[player.user] * self.TEAMEDWEIGHT)
+        self.__ts = (self.lastPlayed * self.PLAYEDWEIGHT) + (self.teamed[player.getUser()] * self.TEAMEDWEIGHT)
         return self.__ts
 
     def getTeamScore(self):
         return self.__ts
+
+    def getUser(self):
+        return self.__user
 
         
 # Class to hold all of the fighters in the queue
@@ -57,6 +60,8 @@ class Fighters(ABC):
 
         for i in players:
             self.loadout.append(Fighter(i, players))
+
+        random.shuffle(self.loadout)
 
         # self.currentQueue.clear()
 
@@ -118,7 +123,7 @@ class Singles(Fighters):
         for i in self.currentQueue:
             for j in self.currentQueue:
                 if i != j:
-                    i.fought[j.user] += 1
+                    i.fought[j.getUser()] += 1
             i.lastPlayed = self.currentGame
 
         self.currentGame += 1
@@ -202,16 +207,16 @@ class Doubles(Fighters):
 
         c = 0 # Counter
         while c < 2:
-            t1[c].teamed[t1[(c + 1) % 2].user] += 1
+            t1[c].teamed[t1[(c + 1) % 2].getUser()] += 1
             t1[c].lastPlayed = self.currentGame
 
-            t2[c].teamed[t2[(c + 1) % 2].user] += 1
+            t2[c].teamed[t2[(c + 1) % 2].getUser()] += 1
             t2[c].lastPlayed = self.currentGame
             
             cc = 0
             while cc < 2:
-                t1[c].fought[t2[cc].user] += 1
-                t2[c].fought[t1[cc].user] += 1
+                t1[c].fought[t2[cc].getUser()] += 1
+                t2[c].fought[t1[cc].getUser()] += 1
                 cc += 1
             
             c += 1
