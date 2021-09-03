@@ -3,7 +3,7 @@ import random
 # import youtube_dl
 from discord.ext import commands
 import json
-import cogs.smash
+from smash.smash import Singles, Doubles, Fighter
 import sys
 
 TOKEN = json.loads(open("json/TOKEN_ID.json", "r").read()).get("TOKEN")
@@ -187,7 +187,7 @@ async def fight(ctx, fight_type):
 
         # Singles Fights (1v1 or FFA)
         if fight_type == "singles":
-            smash_queue = cogs.smash.Singles(smashers, playersPerGame)
+            smash_queue = Singles(smashers, playersPerGame)
             await next_fight(ctx)
 
         # 2 on 2 fights
@@ -195,7 +195,7 @@ async def fight(ctx, fight_type):
             if len(smashers) < 4:
                 await ctx.send("You can't do doubles with less than 4 people!")
             else:
-                smash_queue = cogs.smash.Doubles(smashers)
+                smash_queue = Doubles(smashers)
                 await next_fight(ctx)
 
         
@@ -227,7 +227,7 @@ async def next_fight(ctx):
     # temp, remove after debug
     flare = 8
 
-    if isinstance(smash_queue, cogs.smash.Singles):
+    if isinstance(smash_queue, Singles):
         q = smash_queue.generate()
         c = 0
         s = "Next up: "
@@ -239,7 +239,7 @@ async def next_fight(ctx):
         
         await ctx.send(s)
 
-    elif isinstance(smash_queue, cogs.smash.Doubles):
+    elif isinstance(smash_queue, Doubles):
         q = smash_queue.generate()
         await ctx.send(
             "Next up: " + q[0].getUser().mention + " and " + q[1].getUser().mention + " vs. " + q[2].getUser().mention + " and " + q[3].getUser().mention
