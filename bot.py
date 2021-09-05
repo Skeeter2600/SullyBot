@@ -5,9 +5,9 @@ from discord.ext import commands
 
 import json
 
-TOKEN = json.loads(open("json/TOKEN_ID.json", "r").read()).get("HONEY")
+TOKEN = json.loads(open("json/TOKEN_ID.json", "r").read()).get("TOKEN")
 
-client = commands.Bot(command_prefix="~")
+client = commands.Bot(command_prefix="*")
 
 
 # ydl = youtube_dl.YoutubeDL({'outtmpl': '%(id)s%(ext)s'})
