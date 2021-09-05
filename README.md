@@ -92,7 +92,7 @@ Below is a table to help with using the parameters for this command:
 | `Condition`       | `Arg`                  | Notes                                                             |
 | ----------------- | ---------------------- | ----------------------------------------------------------------- |
 | `roster`          | None                   | Prints the current smash roster                                   |
-| `clear`           | None                   | Clears the current smah roster                                    |
+| `clear`           | None                   | Clears the current smash roster                                    |
 | `add`             | Mentioned Discord User | Adds the mentioned Discord user to the roster                     |
 | `remove` / `drop` | Mentioned Discord User | Removes the mentioned Discord user from the roster                |
 | `players`         | None                   | Prints the number of players that play per singles match          |
@@ -116,3 +116,19 @@ Below is a table to help with using the parameters for this command:
 Generates a set of players to play in the next round of smash, and mentions those players in the Discord chat. This command works the same, no matter if you're playing singles or doubles.
 
 Do not use this command if you haven't generated a game yet using the `fight` command, or if you haven't started a roster yet using the `smash` command.
+
+## Music Functions
+
+These commands will be used for the music bot functionality of SullyBot.
+
+Below is a table to help with using the parameters for this command:
+
+| `Condition`       | `Arg`                  | Notes                                                                 |
+| ----------------- | ---------------------- | -----------------------------------------------------------------     |
+| `play`            | Song URL               | Will play the song or add it to a queue if a song is playing already  |
+| `queue`           | None                   | This will display up to the next 10 songs in a queue                  |
+| `pause`           | None                   | Pauses the currently playing song                                     |
+| `resume`          | None                   | Resumes the currently playing song                                    |
+| `skip`            | None                   | This will skip the currently playing song and continue to the next    |
+| `clear`           | None                   | Clears the song queue                                                 |
+| `shuffle_queue`   | None                   | This will shuffle the songs that are in the queue                     |

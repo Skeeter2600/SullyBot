@@ -30,7 +30,6 @@ class music_cog(commands.Cog):
     async def on_ready(self):
         print("Music Cog is online")
 
-    # searching the item on youtube
     def search_yt(self, item):
         with YoutubeDL(self.YDL_OPTIONS) as ydl:
             try:
@@ -44,24 +43,19 @@ class music_cog(commands.Cog):
         if len(self.music_queue) > 0:
             self.is_playing = True
 
-            # get the first url
             m_url = self.music_queue[0][0]['source']
 
-            # remove the first element as you are currently playing it
             self.music_queue.pop(0)
 
             self.vc.play(discord.FFmpegPCMAudio(m_url, **self.FFMPEG_OPTIONS), after=lambda e: self.play_next())
         else:
             self.is_playing = False
 
-    # infinite loop checking
     async def play_music(self):
         if len(self.music_queue) > 0:
             self.is_playing = True
 
             m_url = self.music_queue[0][0]['source']
-
-            # try to connect to voice channel if you are not already connected
 
             if self.vc == "" or not self.vc.is_connected() or self.vc is None:
                 self.vc = await self.music_queue[0][1].connect()
@@ -70,7 +64,6 @@ class music_cog(commands.Cog):
                 await self.vc.move_to(self.music_queue[0][1])
 
             await self.tc.send("**Now Playing:** " + self.music_queue[0][0]['title'], delete_after=30)
-            # remove the first element as you are currently playing it
             self.music_queue.pop(0)
 
             self.vc.play(discord.FFmpegPCMAudio(m_url, **self.FFMPEG_OPTIONS), after=lambda e: self.play_next())
@@ -84,8 +77,7 @@ class music_cog(commands.Cog):
 
         voice_channel = ctx.author.voice.channel
         if voice_channel is None:
-            # you need to be connected so that the bot knows where to go
-            await ctx.send("Connect to a voice channel!")
+            await ctx.send("Connect to a voice channel, dummy!")
         else:
             song = self.search_yt(query)
             if type(song) == type(True):
@@ -137,6 +129,13 @@ class music_cog(commands.Cog):
     async def shuffle_q(self, ctx):
         random.shuffle(self.music_queue)
         await ctx.send("The queue has been shuffled")
+
+    @commands.command(name="clear_queue")
+    async def clear_q(self, ctx):
+        self.music_queue = []
+        self.vc.stop()
+        await ctx.send("The queue has been cleared")
+
 
 
 def setup(client):
