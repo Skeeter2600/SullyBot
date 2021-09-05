@@ -1,21 +1,13 @@
-import discord
 import random
-# import youtube_dl
+
+import discord
 from discord.ext import commands
+
 import json
-from smash.smash import Singles, Doubles, Fighter
-import sys
 
-TOKEN = json.loads(open("json/TOKEN_ID.json", "r").read()).get("TOKEN")
+TOKEN = json.loads(open("json/TOKEN_ID.json", "r").read()).get("HONEY")
 
-client = commands.Bot(command_prefix="*")
-players = {}
-smashers = []
-smash_queue = []
-playersPerGame = 2
-mix_up = 1
-
-smash_queue_pointer = 0
+client = commands.Bot(command_prefix="~")
 
 
 # ydl = youtube_dl.YoutubeDL({'outtmpl': '%(id)s%(ext)s'})
@@ -68,37 +60,42 @@ smash_queue_pointer = 0
 
 @client.event
 async def on_ready():
-    print("I'm back, bitches")
+    print("I'm back, baybee")
 
 
 # --------------------------------------------------------------------------------------------------------------------
+
 @client.event
 async def on_member_join(member):
     print(f'{member} has joined the server. Get the chalice ready, NotSoBot.')
 
 
 # --------------------------------------------------------------------------------------------------------------------
+
 @client.event
 async def on_member_remove(member):
     print("Hasta la vista, " + f'{member}')
 
 
 # --------------------------------------------------------------------------------------------------------------------
+
 @client.command()
 async def ping(ctx):
     if client.latency * 1000 > 500:
-        await ctx.send(f' Dayum, yo internet slow as fuck "( {round(client.latency * 1000)} ms )"')
+        await ctx.send(f' Dayum, yo internet slow : "( {round(client.latency * 1000)} ms )"')
     else:
-        await ctx.send(f' You good ( {round(client.latency * 1000)} ms )')
+        await ctx.send(f' You good : ( {round(client.latency * 1000)} ms )')
 
 
 # --------------------------------------------------------------------------------------------------------------------
+
 @client.command()
 async def pong(ctx):
     await ctx.send("Ping!!!!!!!!!")
 
 
 # --------------------------------------------------------------------------------------------------------------------
+
 @client.command()
 async def advise(ctx, *, question):
     answers = json.loads(open("responses/questions.json", "r").read()).get("answers")
@@ -106,6 +103,7 @@ async def advise(ctx, *, question):
 
 
 # --------------------------------------------------------------------------------------------------------------------
+
 @client.command(aliases=['hi'])
 async def hello(ctx):
     hellos = json.loads(open("responses/hellos.json", "r").read()).get("hellos")
@@ -113,6 +111,7 @@ async def hello(ctx):
    
 
 # --------------------------------------------------------------------------------------------------------------------
+
 @client.command()
 async def image(ctx, message):
     if message == "🥺":
@@ -137,32 +136,21 @@ async def image(ctx, message):
 
 
 # --------------------------------------------------------------------------------------------------------------------
+
 @client.command()
-async def start(ctx, extension):
+async def start(extension):
     client.load_extension(f'cogs.{extension}')
 
 
 # --------------------------------------------------------------------------------------------------------------------
+
 @client.command()
-async def end(ctx, extension):
+async def end(extension):
     client.unload_extension(f'cogs.{extension}')
 
 
 # --------------------------------------------------------------------------------------------------------------------
-@client.command()
-async def join(ctx):
-    channel = ctx.author.voice.channel
-    await channel.connect()
 
-
-# --------------------------------------------------------------------------------------------------------------------
-@client.command(aliases=['disconnect'])
-async def leave(ctx):
-    server = ctx.message.guild.voice_client
-    await server.disconnect()
-
-
-# --------------------------------------------------------------------------------------------------------------------
 @client.command()
 async def dev(ctx, condition, person):
     try:
@@ -188,7 +176,7 @@ async def dev(ctx, condition, person):
         await ctx.send(f"User \"{person}\"doesn't exist. Mention one that does...")
 
 
-@client.command(aliases=["quit", "q", "kil", "kill", "die"])
+@client.command(aliases=["quit", "kil", "kill", "die"])
 async def close(ctx):
     devs = json.loads(open("json/devs.json", "r").read()).get("devs")
     if ctx.author.id in devs:
@@ -210,7 +198,8 @@ async def close(ctx):
 #        ctx.voice_channel.play(player, after=lambda e: print('Player error: %s' % e) if e else None)
 #    await ctx.send('Now playing: {}'.format(player.title))
 
-client.load_extension("cogs.smashCog")
+client.load_extension("cogs.smash_cog")
 client.load_extension("cogs.rpg_quest")
+client.load_extension("cogs.music_cog")
 
 client.run(TOKEN)
