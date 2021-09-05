@@ -12,6 +12,10 @@ Currently, all SullyBot commands are used by typing in the Discord chat. Each Su
 
 If setting this bot up for personal use, you will need to add a `json` folder to the root of the bot's directory. Currently, this folder holds two files you will need: `json/TOKEN_ID.json` and `json/devs.json`.
 
+Your bot directory should look like this:
+
+![Example of bot directory with json files and folder added correctly](screenshots/json_directory.png)
+
 The `TOKEN_ID.json` file is what will hold your Discord bot Token to connect to Discord's API. The contents should look as follows:
 
 ```json
@@ -24,12 +28,11 @@ The `devs.json` file contains all of the Discord user ID's that are on your bot'
 
 ```json
 {
-    "devs": [
-        000000000000000000, //First User ID as 18-digit int
-        000000000000000000 //Potential Second User ID, and so on
-    ]
+    "devs": [000000000000000000, 000000000000000000]
 }
 ```
+
+> In `devs.json`, these user ID's should be 18 digit integers as shown above. Although you only need to start with one ID, two are shown here to demonstrate how they should be formatted as an integer and delimited with a comma.
 
 You can find your user ID by first enabling Developer Mode in Discord(Settings > App Settings > Advanced > Enable Developer Mode), then right-clicking your profile and choosing "Copy ID".
 
