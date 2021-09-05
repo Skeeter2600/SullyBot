@@ -14,7 +14,7 @@ If setting this bot up for personal use, you will need to add a `json` folder to
 
 Your bot directory should look like this:
 
-![Example of bot directory with json files and folder added correctly](screenshots/json_directory.png)
+![json/TOKEN_ID.json and json/devs.json in the bot directory](screenshots/json_directory.png "Example of Correctly Added json Files and Folder")
 
 The `TOKEN_ID.json` file is what will hold your Discord bot Token to connect to Discord's API. The contents should look as follows:
 
