@@ -1,6 +1,6 @@
 # SullyBot
 
-_A Discord bot by and for people who hate themselves_
+_A Discord bot by and for people who are kinda good at a few things_
 
 # Usage and Setup
 
