@@ -6,7 +6,7 @@ _A Discord bot by and for people who are kinda good at a few things_
 
 ## Quick Tips
 
-Currently, all SullyBot commands are used by typing in the Discord chat. Each SullyBot command uses the format `!{command}`.
+Currently, all SullyBot commands are used by typing in the Discord chat. Each SullyBot command uses the format `*{command}`.
 
 ## Setup Notes
 
