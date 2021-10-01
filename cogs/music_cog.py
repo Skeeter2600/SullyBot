@@ -71,6 +71,17 @@ class music_cog(commands.Cog):
             self.is_playing = False
             self.title_sent = False
 
+    @commands.command(name="join")
+    async def join(self, ctx):
+        voice_channel = ctx.author.voice.channel
+        if voice_channel is None:
+            await ctx.send("Connect to a voice channel, dummy!")
+        await voice_channel.connect()
+
+    @commands.command(name="leave")
+    async def leave(self, ctx):
+        await ctx.voice_client.disconnect()
+
     @commands.command(name="play")
     async def p(self, ctx, *args):
         query = " ".join(args)

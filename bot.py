@@ -1,13 +1,15 @@
 import random
 
 import discord
+from discord import Reaction
 from discord.ext import commands
+from discord.ext.commands import bot
 
 import json
 
-TOKEN = json.loads(open("json/TOKEN_ID.json", "r").read()).get("TOKEN")
+TOKEN = json.loads(open("json/TOKEN_ID.json", "r").read()).get("HONEY")
 
-client = commands.Bot(command_prefix="*")
+client = commands.Bot(command_prefix="~")
 
 
 @client.event
@@ -62,29 +64,24 @@ async def advise(ctx, *, question):
 async def hello(ctx):
     hellos = json.loads(open("responses/hellos.json", "r").read()).get("hellos")
     await ctx.send(random.choice(hellos))
-   
+
 
 # --------------------------------------------------------------------------------------------------------------------
 
 @client.command()
 async def image(ctx, message):
     if message == "🥺":
-        await ctx.send("🥺🥺🥺🥺🥺🥺")
+        reaction = json.loads(open("responses/funtext.json", "r").read()).get("🥺")
+        await ctx.send(reaction)
     elif message == "jerkoff":
-        await ctx.send(":middle_finger:         :weary:\n   :bug::zzz::necktie::bug:\n               ⛽️       :boot:\n "
-                       "              ⚡️8=:punch:=D:sweat_drops:\n          :guitar: "
-                       ":closed_umbrella:\n          ⛽️      ⛽️\n          :boot:      :boot:")
+        reaction = json.loads(open("responses/funtext.json", "r").read()).get("jerkoff")
+        await ctx.send(reaction)
     elif message == "daffy":
-        await ctx.send("--------┈┈╱╱╱▔ --------┈╱╭┈▔▔╲ \n--------▕▏┊╱╲┈╱▏  \n--------▕▏▕╮▕▕╮▏ --------▕▏▕▋▕▕▋  "
-                       "\n--------╱▔▔╲╱▔▔╲╮┈┈╱▔▔╲  \n--------▏▔▏┈┈▔┈┈▔▔▔╱▔▔╱ \n ---------╲┈╲┈┈┈┈┈┈┈╱▔▔▔  "
-                       "\n----------┈▔╲╲▂▂▂▂▂╱  \n----------┈┈▕━━▏ \n ⠄⠄⠄⠄⠄⠄⣠⢼⣿⣷⣶⣾⡷⢸⣗⣯⣿⣶⣿⣶⡄ \n⠄⠄⠄ "
-                       "⠄⠄⣀⣤⣴⣾⣿⣷⣭⣭⣭⣾⣿⣿⣿⣿⣿⣿⣿⣿⣿⡀ \n⠄⠄ ⠄⣾⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣸⣿⣿⣧ \n⠄⠄ ⠄⣿⣿⢿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣯⢻⣿⣿⡄ \n⠄ "
-                       "⠄⢸⣿⣮⣿⣿⣿⣿⣿⣿⣿⡟⢹⣿⣿⣿⡟⢛⢻⣷⢻⣿⣧ \n⠄ ⠄⠄⣿⡏⣿⡟⡛⢻⣿⣿⣿⣿⠸⣿⣿⣿⣷⣬⣼⣿⢸⣿⣿ \n⠄ ⠄⠄⣿⣧⢿⣧⣥⣾⣿⣿⣿⡟⣴⣝⠿⣿⣿⣿⠿⣫⣾⣿⣿⡆ \n "
-                       "⠄⠄⢸⣿⣮⡻⠿⣿⠿⣟⣫⣾⣿⣿⣿⣷⣶⣾⣿⡏⣿⣿⣿⡇ \n ⠄⠄⢸⣿⣿⣿⡇⢻⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣇⣿⣿⣿⡇ \n ⠄⠄⢸⣿⣿⣿⡇⠄⢿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⢸⣿⣿⣿⠄ \n "
-                       "⠄⠄⣼⣿⣿⣿⢃⣾⣾⣿⣿⣿⣿⣿⣿⣿⣿⣿⡏⣿⣿⣿ \n⠄ ⠄⠄⣿⣿⡟⣵⣿")
-
-    elif message == "<:Quagsire:651960845944750083>":
-        with open('etc/images/quagsire1.jpg', 'rb') as f:
+        reaction = json.loads(open("responses/funtext.json", "r").read()).get("daffy")
+        await ctx.send(reaction)
+    elif message == "quagsire":
+        image_number = random.randint(1, 3)
+        with open('etc/images/quagsire' + image_number + '.jpg', 'rb') as f:
             picture = discord.File(f)
             await ctx.send(picture)
 
@@ -112,7 +109,7 @@ async def dev(ctx, condition, person):
     except ValueError:
         await ctx.send(f'User "{person}" doesn\'t exist. Mention one that does...')
 
-    if user != None:
+    if user is not None:
         devs = json.loads(open("json/devs.json", "r").read())
         if condition == "add":
             devs["devs"].append(user.id)
@@ -130,6 +127,8 @@ async def dev(ctx, condition, person):
         await ctx.send(f"User \"{person}\"doesn't exist. Mention one that does...")
 
 
+# --------------------------------------------------------------------------------------------------------------------
+
 @client.command(aliases=["quit", "kil", "kill", "die"])
 async def close(ctx):
     devs = json.loads(open("json/devs.json", "r").read()).get("devs")
@@ -141,16 +140,24 @@ async def close(ctx):
         await ctx.send("**you lack the power to shut me down**")
 
 
-# @client.command()
-# async def play(ctx, url):
-#    print(url)
-#    server = ctx.message.guild
-#    voice_channel = server.voice_client
-#
-#    async with ctx.typing():
-#        player = await YTDLSource.from_url(url, loop=self.bot.loop)
-#        ctx.voice_channel.play(player, after=lambda e: print('Player error: %s' % e) if e else None)
-#    await ctx.send('Now playing: {}'.format(player.title))
+# --------------------------------------------------------------------------------------------------------------------
+
+@client.event
+async def on_raw_reaction_add(reaction, user):
+    thumbs_up_count = 0
+    channel_main = json.loads(open("json/dankest.json", "r").read()).get("terrabites main")
+    if await reaction.channel_id == channel_main:
+        reactions = reaction.message_id
+        for reaction in reactions:
+            if reaction == ":thumbsup:":
+                thumbs_up_count += 1
+        if thumbs_up_count == 4:
+            message_content = reaction.message.content
+            dankest_channel = json.loads(open("json/dankest.json", "r").read()).get("terrabites dank")
+            await dankest_channel.send(message_content)
+
+
+# --------------------------------------------------------------------------------------------------------------------
 
 client.load_extension("cogs.smash_cog")
 client.load_extension("cogs.rpg_quest")
