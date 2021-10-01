@@ -7,7 +7,7 @@ from discord.ext.commands import bot
 
 import json
 
-TOKEN = json.loads(open("json/TOKEN_ID.json", "r").read()).get("HONEY")
+TOKEN = json.loads(open("json/TOKEN_ID.json", "r").read()).get("TOKEN")
 
 client = commands.Bot(command_prefix="~")
 
