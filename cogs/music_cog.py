@@ -57,13 +57,10 @@ class music_cog(commands.Cog):
 
             m_url = self.music_queue[0][0]['source']
 
-            if self.vc == "" or not self.vc.is_connected() or self.vc is None:
+            if self.vc == "" or self.vc is None:
                 self.vc = await self.music_queue[0][1].connect()
-            else:
 
-                await self.vc.move_to(self.music_queue[0][1])
-
-            await self.tc.send("**Now Playing:** " + self.music_queue[0][0]['title'], delete_after=30)
+            await self.tc.send("**Now Playing:** " + self.music_queue[0][0]['title'])
             self.music_queue.pop(0)
 
             self.vc.play(discord.FFmpegPCMAudio(m_url, **self.FFMPEG_OPTIONS), after=lambda e: self.play_next())
@@ -76,11 +73,40 @@ class music_cog(commands.Cog):
         voice_channel = ctx.author.voice.channel
         if voice_channel is None:
             await ctx.send("Connect to a voice channel, dummy!")
-        await voice_channel.connect()
+        else:
+            self.tc = ctx.message.channel
+            self.music_queue.append([{'source': 'https://r4---sn-ab5sznl7.googlevideo.com/videoplayback?expire=163340887'
+                                                '1&ei=B4NbYaPBH-PhgwOgjI_oDg&ip=129.21.130.204&id=o-AHuL7G512M2Yw8HHIOM'
+                                                'dkL5Q_-YfOddW7e7lRFTfunHM&itag=249&source=youtube&requiressl=yes&mh=VK'
+                                                '&mm=31%2C26&mn=sn-ab5sznl7%2Csn-p5qs7ned&ms=au%2Conr&mv=m&mvi=4&pl=16&'
+                                                'pcm2=yes&initcwndbps=3465000&vprv=1&mime=audio%2Fwebm&ns=HqZP9HAwkUOjN'
+                                                'WE6-Amy5FsG&gir=yes&clen=494&dur=0.381&lmt=1496327315141176&mt=1633386'
+                                                '777&fvip=4&keepalive=yes&fexp=24001373%2C24007246&c=WEB&n=uhd_MjsnqdNe'
+                                                'oPoZ&sparams=expire%2Cei%2Cip%2Cid%2Citag%2Csource%2Crequiressl%2Cpcm2'
+                                                '%2Cvprv%2Cmime%2Cns%2Cgir%2Cclen%2Cdur%2Clmt&sig=AOq0QJ8wRgIhALppERor4'
+                                                'vlL29_dxTO27fIV1D97rs1u5dSRMjgg-y6KAiEArOYkY3tz8VvnFWqM7RwTQQcB6NBZjq'
+                                                '-Rwh1qEnI0WBU%3D&lsparams=mh%2Cmm%2Cmn%2Cms%2Cmv%2Cmvi%2Cpl%2Cinitcwn'
+                                                'dbps&lsig=AG3C_xAwRQIhAL7qe_LQRSadQCFdhgU4Y7xR-78Ry6rKL5lo2FLRvER1AiB'
+                                                'rDUEkzedTWNQ_nvMu39a0apIPjfv9puahNBy6-1d0HQ%3D%3D', 'title': 'Shortest'
+                                                ' Video on Youtube EVER! 0 seconds nearly 1 (fastest)'}, voice_channel])
+            self.is_playing = True
+
+            self.vc = await self.music_queue[0][1].connect()
+            self.is_playing = True
+
+            m_url = self.music_queue[0][0]['source']
+
+            if self.vc == "" or self.vc is None:
+                self.vc = await self.music_queue[0][1].connect()
+
+            self.music_queue.pop(0)
+
+            self.vc.play(discord.FFmpegPCMAudio(m_url, **self.FFMPEG_OPTIONS), after=lambda e: self.play_next())
 
     @commands.command(name="leave")
     async def leave(self, ctx):
         await ctx.voice_client.disconnect()
+        await ctx.message.send("Hasta luego")
 
     @commands.command(name="play")
     async def p(self, ctx, *args):
@@ -95,15 +121,15 @@ class music_cog(commands.Cog):
                 await ctx.send(
                     "This song couldn't be played, try another version")
             else:
-                await ctx.send("Song added to the queue")
+                await ctx.send("Song added to the queue", delete_after=30)
                 self.music_queue.append([song, voice_channel])
 
                 if not self.is_playing:
                     self.tc = ctx.message.channel
                     await self.play_music()
 
-    @commands.command(name="queue")
-    async def q(self, ctx):
+    @commands.command(alias="queue, q")
+    async def queue(self, ctx):
         retval = ""
         q_length = len(self.music_queue)
         if q_length > 10:
@@ -117,7 +143,7 @@ class music_cog(commands.Cog):
         else:
             await ctx.send("No music in queue")
 
-    @commands.command(name="skip_song")
+    @commands.command(name="skip", alias="skip_song")
     async def skip(self, ctx):
         if self.vc != "" and self.vc:
             self.vc.stop()
@@ -136,17 +162,16 @@ class music_cog(commands.Cog):
             self.vc.resume()
             await ctx.send("Song resumed")
 
-    @commands.command(name="shuffle_queue")
-    async def shuffle_q(self, ctx):
+    @commands.command(alias="shuffle, shuffle_q")
+    async def shuffle_queue(self, ctx):
         random.shuffle(self.music_queue)
         await ctx.send("The queue has been shuffled")
 
-    @commands.command(name="clear_queue")
-    async def clear_q(self, ctx):
+    @commands.command(name="clear_q")
+    async def clear_queue(self, ctx):
         self.music_queue = []
         self.vc.stop()
         await ctx.send("The queue has been cleared")
-
 
 
 def setup(client):
